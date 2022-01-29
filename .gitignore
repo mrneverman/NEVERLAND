@@ -1,0 +1,6 @@
+#directory which contains ssh public key & gcloud json auth. file
+sensitive_data
+#terraform state file, terraform directory, and other terraform related files
+.terraform*
+terraform.tfstate
+variables_private.tf
