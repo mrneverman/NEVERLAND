@@ -1,0 +1,8 @@
+- name: Play 
+  hosts: all
+  tasks:
+  - name: Execute command ‘date’
+    command: "date"
+    register: date_out
+  - debug:
+      var: date_out
