@@ -4,3 +4,5 @@ sensitive_data
 .terraform*
 terraform.tfstate*
 variables_private.tf
+# ideas
+notes.txt
