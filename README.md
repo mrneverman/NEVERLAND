@@ -27,3 +27,4 @@ Items in the technology roadmap of Neverland are listed  below in unordered way.
 - Implementation of Kyverno policy engine
 - Create a very secure Worktown for top secret projects of Neverland. (Gvisor, KataContainers, AppArmor, Seccomp etc.)
 - Increase the number of islands in Nevertown for high availability of K8S control plane components.
+- Implementation of HashiCorp Vault
