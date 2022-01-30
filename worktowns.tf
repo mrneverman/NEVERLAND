@@ -4,6 +4,8 @@ module "worktowns" {
   instance_ansible_file = "playbook.yaml"
   ssh_user              = var.ssh_user
   for_each              = toset(var.worker_nodes_name)
+  
+  depends_on = [ module.nevertown]
 }
 
 output "worktowns-IPs" {
