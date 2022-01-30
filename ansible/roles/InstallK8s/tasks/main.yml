@@ -1,0 +1,125 @@
+---
+# tasks file for InstallK8s
+# Based on the : https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+#                https://buildvirtual.net/deploy-a-kubernetes-cluster-using-ansible/
+#                https://www.linuxsysadmins.com/install-kubernetes-cluster-with-ansible/   
+#                https://subok-tech.com/installing-kubernetes-using-ansible-on-ubuntu-20-04/
+     - name: Create containerd config file
+       file:
+         path: "/etc/modules-load.d/containerd.conf"
+         state: "touch"
+
+     - name: Add conf for containerd
+       blockinfile:
+         path: "/etc/modules-load.d/containerd.conf"
+         block: |
+               overlay
+               br_netfilter
+
+     - name: modprobe
+       shell: |
+               modprobe overlay
+               modprobe br_netfilter
+
+
+     - name: Set system configurations for Kubernetes networking
+       file:
+         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+         state: "touch"
+
+     - name: Add conf for containerd
+       blockinfile:
+         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+         block: |
+                net.bridge.bridge-nf-call-iptables = 1
+                net.ipv4.ip_forward = 1
+                net.bridge.bridge-nf-call-ip6tables = 1
+
+     - name: Apply new settings
+       command: sysctl --system
+     
+     - name: update cache ~ apt-get update
+       apt:
+         update_cache: true
+
+     - name: install containerd
+       apt:
+         name:
+         - containerd
+         state: present
+
+     - name: Create /etc/containerd
+       file:
+         path: /etc/containerd
+         state: directory
+
+     - name: Configure containerd.
+       shell: /usr/bin/containerd config default > /etc/containerd/config.toml
+        
+     - name: enable and restart containerd 
+       service:
+         name: containerd
+         state: restarted
+         enabled: yes
+         daemon-reload: yes
+
+     - name: Make the Swap inactive
+       command: swapoff -a
+
+     - name: Remove Swap entry from /etc/fstab.
+       lineinfile:
+         dest: /etc/fstab
+         regexp: swap
+         state: absent
+
+     - name: install apt-transpors-https curl
+       apt:
+         name:
+         - apt-transport-https
+         - curl
+         state: present
+
+     - name: Add the Google Cloud public signing key
+       apt_key:
+         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+         state: present
+
+     - name: Create kubernetes repo file
+       apt_repository:
+         repo: deb http://apt.kubernetes.io/ kubernetes-xenial main 
+         state: present
+         filename: kubernetes
+         mode: 0600
+
+     - name: install kubelet
+       apt: 
+         name:
+         - kubelet={{ K8s_version }}
+         state: present
+       when: install_kubelet 
+     
+     - name: enable and restart kubelet
+       service:
+         name: kubelet
+         state: restarted
+         enabled: yes 
+       when: install_kubelet
+
+     - name: install kubeadm
+       apt:
+         name:
+         - kubeadm={{ K8s_version }}
+         state: present
+       when: install_kubeadm
+
+     - name: install kubectl
+       apt:
+         name:
+         - kubectl={{ K8s_version }}
+         state: present
+       when: install_kubectl
+ 
+
+
+
+

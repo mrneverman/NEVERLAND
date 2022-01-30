@@ -1,7 +1,7 @@
 module "nevertown" {
   source                = "./terraform/modules/gci"
   instance_name         = "nevertown"
-  instance_ansible_file = "playbook.yaml"
+  instance_ansible_file = "./ansible/nevertown_init.yaml"
   ssh_user              = var.ssh_user
 }
 

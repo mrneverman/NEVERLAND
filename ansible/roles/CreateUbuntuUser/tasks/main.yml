@@ -1,0 +1,17 @@
+---
+# tasks file for CreateUbuntuUser
+ - name: create a user named "{{ user_name }}" 
+   user: name={{ user_name }} append=yes state=present createhome=yes shell=/bin/bash
+
+ - name: Give passwordless sudo to "{{ user_name }}" with all root permisions
+   lineinfile:
+     dest: /etc/sudoers
+     line: '{{ user_name }} ALL=(ALL) NOPASSWD: ALL'
+     validate: 'visudo -cf %s'
+ 
+ - name: copy public key for "{{ user_name }}"
+   authorized_key: user={{ user_name }} key={{ item }}
+   with_file:
+   - ../sensitive_data/{{ user_name }}.pub
+
+
