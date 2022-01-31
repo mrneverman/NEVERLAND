@@ -19,6 +19,7 @@ Neverland is created by Mr.Neverman in AN.0 with the inspiration of [Republic of
 ## Technology Roadmap of Neverland
 Items in the technology roadmap of Neverland are listed  below in unordered way.
 - VPC and Firewall implementation.
+- Prometheus and Grafana implementation in "Island of Intelligence".
 - ETCD encryption.
 - Separate ETCD from Nevertown and implement it in different island for high availability and also to reduce the attack surface.
 - Implementation of CD pipelines( Argo CD).
