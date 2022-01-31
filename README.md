@@ -21,10 +21,11 @@ Items in the technology roadmap of Neverland are listed  below in unordered way.
 - VPC and Firewall implementation.
 - ETCD encryption.
 - Separate ETCD from Nevertown and implement it in different island for high availability and also to reduce the attack surface.
-- Implementation of CD pipelines( Argo CD)
-- Implementation of service mesh (Istio or Console)
-- Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface
-- Implementation of Kyverno policy engine
-- Create a very secure Worktown for top secret projects of Neverland. (Gvisor, KataContainers, AppArmor, Seccomp etc.)
+- Implementation of CD pipelines( Argo CD).
+- Implementation of service mesh (Istio or Console).
+- Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface.
+- Implementation of Kyverno policy engine.
+- Create a very secure Worktown for top secret projects of Neverland. (Gvisor, KataContainers, AppArmor, Seccomp etc.).
 - Increase the number of islands in Nevertown for high availability of K8S control plane components.
-- Implementation of HashiCorp Vault
+- Implementation of HashiCorp Vault.
+- Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8).
