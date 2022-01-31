@@ -30,3 +30,6 @@ Items in the technology roadmap of Neverland are listed  below in unordered way.
 - Increase the number of islands in Nevertown for high availability of K8S control plane components.
 - Implementation of HashiCorp Vault.
 - Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8).
+- Log monitoring (Elastic Stack & fluentd)
+- Falco for runtime security
+- Database implementation
