@@ -6,3 +6,5 @@ terraform.tfstate*
 variables_private.tf
 # ideas
 notes.txt
+# K8s config file and join token
+ansible/ClusterInitFiles/

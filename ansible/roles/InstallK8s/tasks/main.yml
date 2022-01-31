@@ -119,7 +119,48 @@
          state: present
        when: install_kubectl
  
+     - name: Intilizing Kubernetes Cluster
+       command: kubeadm init --pod-network-cidr "{{ pod_network_cidr }}" 
+       when: nodeType == "master"
 
+     - name: /etc/kubernetes/admin.conf from remote to local.
+       fetch:
+         src: /etc/kubernetes/admin.conf
+         dest: ./ClusterInitFiles/
+         flat: yes
+       when: nodeType == "master"
 
+     - name: Get the token for joining the nodes with Kuberentes master.
+       shell: kubeadm token create  --print-join-command
+       register: kubernetes_join_command
+       when: nodeType == "master"
+   
+     - debug:
+         msg: "{{ kubernetes_join_command.stdout }}"
+       when: nodeType == "master"
 
+     - name: Copy join command to local file.
+       local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="./ClusterInitFiles/kubernetes_join_command" mode=0777
+       when: nodeType == "master"
 
+     - name: Copy join command from Ansiblehost to the worker nodes.
+       copy:
+         src: ./ClusterInitFiles/kubernetes_join_command
+         dest: /tmp/kubernetes_join_command
+         mode: 0777
+       when: nodeType == "worker"
+
+     - name: Join the Worker nodes to the cluster.
+       command: sh /tmp/kubernetes_join_command
+       register: joined_or_not
+       when: nodeType == "worker"
+
+     - debug:
+         msg: "{{ joined_or_not }}"
+       when: nodeType == "worker"
+
+     - name: Delete join file
+       file:
+         path: /tmp/kubernetes_join_command
+         state: absent
+       when: nodeType == "worker"

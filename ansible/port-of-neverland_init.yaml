@@ -1,0 +1,91 @@
+- name: Port of Neverland initialization  
+  hosts: all
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  become_user: root
+  vars:
+    K8s_version: 1.23.3-00
+    username: kubeman
+ 
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
+    wait_for_connection:
+      delay: 10
+      timeout: 300
+
+  - name: include CreateUbuntuUser role
+    include_role:
+      name: CreateUbuntuUser
+    vars:
+      user_name: "{{ username }}"
+
+  - name: update cache ~ apt-get update
+    apt:
+      update_cache: true
+
+  - name: Add the Google Cloud public signing key
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+
+  - name: Create kubernetes repo file
+    apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main 
+      state: present
+      filename: kubernetes
+      mode: 0600
+
+  - name: install kubectl
+    apt:
+      name:
+      - kubectl={{ K8s_version }}
+      state: present
+
+  - name: Create directory for kube config.
+    file: 
+      path: /home/{{ username }}/.kube
+      state: directory
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: 0755
+
+  - name: copy kube config file
+    copy:
+      src: ./ClusterInitFiles/admin.conf
+      dest: /home/{{ username }}/.kube/config
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: '0644'
+
+  - name: install Pod network
+    become: yes
+    become_user: "{{ username }}"
+    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml 
+    args:
+      chdir: $HOME
+
+  - name: Configure kubectl command auto-completion and aliases.
+    blockinfile:
+      path: /home/{{ username }}/.bashrc
+      insertafter: EOF
+      block: |
+        source <(kubectl completion bash)
+        alias k=kubectl
+        complete -F __start_kubectl k
+        export do="--dry-run=client -o yaml"
+
+  - name: Configure .vimrc.
+    blockinfile:
+      path: /home/{{ username }}/.vimrc
+      insertafter: EOF
+      create: yes
+      marker: "\" {mark} ANSIBLE MANAGED BLOCK"
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: '0644'
+      block: |
+        set expandtab
+        set tabstop=2
+        set shiftwidth=2
+
