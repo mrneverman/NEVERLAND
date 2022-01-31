@@ -1,6 +1,6 @@
 resource "google_compute_instance" "gci" {
   name         = var.instance_name
-  machine_type = "e2-micro"
+  machine_type = "e2-medium"
 
   boot_disk {
     initialize_params {
