@@ -10,16 +10,15 @@ resource "google_compute_instance" "gci" {
     }
   }
 
+  tags = "${var.tags}" 
+
   network_interface {
-    network = "default"
+    subnetwork = "${var.subnetwork_name}"
     access_config {
     }
   }
   metadata = {
     ssh-keys = "${var.ssh_user}:${file("./sensitive_data/gcloud.pub")}"
-  }
-  provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  -i ${self.network_interface.0.access_config.0.nat_ip}, -u ${var.ssh_user} --private-key ./sensitive_data/gcloud.private ${var.instance_ansible_file}"
   }
 }
 
