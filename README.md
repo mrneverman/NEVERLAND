@@ -3,8 +3,8 @@ Neverland is a cluster of islands located in the middle of a tectonic area. Due 
 
 There is only one motto here: Everything As Code!!
 
-- "The Great Port of Neverland" is the main and only entry point to Neverland. It contains kubectl utility to talk to Nevertown and a firewall to protect cluster habitat from unintended visitors.
 - "Nevertown" is the capital of Neverland which governs all activities in K8s cluster. It serves with control plane components including API server, key-value store(etcd), controller manager, scheduler.
+- "The Great Port of Neverland" is the main and only entry point to Neverland. It contains kubectl utility to talk to Nevertown and a firewall to protect cluster habitat from unintended visitors.
 - "Island of Intelligence" is the observatory of cluster islands. It is the home of Prometheus and other related tools to monitor health of cluster islands and each ongoing activities on cluster islands.
 - "Worktown(s)" is  an island(s) where the hardworking residents of Neverland live.
 
