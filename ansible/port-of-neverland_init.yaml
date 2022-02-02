@@ -6,7 +6,7 @@
   become_user: root
   vars:
     K8s_version: 1.23.3-00
-    username: kubeman
+    username: fisherman
  
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
@@ -58,12 +58,12 @@
       group: "{{ username }}"
       mode: '0644'
 
-  - name: install Pod network
-    become: yes
-    become_user: "{{ username }}"
-    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml 
-    args:
-      chdir: $HOME
+#  - name: install Pod network
+#    become: yes
+#    become_user: "{{ username }}"
+#    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml 
+#    args:
+#      chdir: $HOME
 
   - name: Configure kubectl command auto-completion and aliases.
     blockinfile:
@@ -88,4 +88,10 @@
         set expandtab
         set tabstop=2
         set shiftwidth=2
-
+  - name: Copy ssh key for internal nodes
+    copy:
+      src: ../sensitive_data/kubeman
+      dest: /home/{{ username }}/.ssh/
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: '0400'

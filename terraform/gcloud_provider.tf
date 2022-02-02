@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("./sensitive_data/neverland.json")
+  credentials = file("../sensitive_data/neverland.json")
 
   project = "neverland-339618"
   region  = "europe-west6"

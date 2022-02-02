@@ -14,15 +14,17 @@ resource "google_compute_instance" "gci" {
 
   network_interface {
     subnetwork = "${var.subnetwork_name}"
-    access_config {
+/* 
+   access_config {
     }
+*/
   }
   metadata = {
-    ssh-keys = "${var.ssh_user}:${file("./sensitive_data/gcloud.pub")}"
+    ssh-keys = "${var.ssh_user}:${file("../sensitive_data/kubeman.pub")}"
   }
 }
 
 output "ip" {
-  value =  google_compute_instance.gci.network_interface.0.access_config.0.nat_ip
+  value =  google_compute_instance.gci.network_interface.0.network_ip
 }
 
