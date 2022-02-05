@@ -1,5 +1,5 @@
 - name: Port of Neverland initialization  
-  hosts: all
+  hosts: portOfNeverland
   gather_facts: no
   become: yes
   become_method: sudo
@@ -13,9 +13,9 @@
     username: fisherman  
 
   tasks:
-  - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
     wait_for_connection:
-      delay: 10
+      delay: 1
       timeout: 300
 
   - name: update cache ~ apt-get update
@@ -37,7 +37,7 @@
   - name: install kubectl
     apt:
       name:
-      - kubectl={{ K8s_version }}
+      - kubectl={{ K8s_version_ }}
       state: present
 
 #  - name: Wait for K8s master ready @ ./ClusterInitFiles/master.ready

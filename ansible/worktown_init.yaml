@@ -15,21 +15,6 @@
       delay: 10
       timeout: 300
 
-  - name: Proxy settings for APT - 1
-    file:
-      path: "/etc/apt/apt.conf.d/proxy.conf"
-      state: "touch"
-      mode: u=rw,g=r,o=r
-
-  - name: Proxy settings for APT - 2
-    blockinfile:
-      path: "/etc/apt/apt.conf.d/proxy.conf"
-      block: |
-             Acquire {
-                      HTTP::proxy {{ ioi_internal_ip }}:{{ tinyproxy_port}};
-                      HTTPS::proxy {{ ioi_internal_ip }}:{{ tinyproxy_port}};
-                     }
-
   - name: install containerd and K8s with kubeadm
     include_role:
       name: InstallK8s
@@ -37,6 +22,5 @@
       install_kubelet: true
       install_kubeadm: true
       install_kubectl: false
-      K8s_version: {{ K8s_version }}
       nodeType: "worker"
       pod_network_cidr: {{ vpc_cidr }}

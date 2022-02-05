@@ -1,5 +1,5 @@
 - name: Nevertown initialization  
-  hosts: all
+  hosts: Nevertown
   gather_facts: no
   become: yes
   become_method: sudo
@@ -8,26 +8,14 @@
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
   - ./terraform_variables/tf_network_vars_file.yml
   - ./variables.yaml
+  environment:
+    http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+    https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
   tasks:
-  - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
     wait_for_connection:
-      delay: 10
+      delay: 1
       timeout: 300
-
-  - name: Proxy settings for APT - 1
-    file:
-      path: "/etc/apt/apt.conf.d/proxy.conf"
-      state: "touch"
-      mode: u=rw,g=r,o=r
-
-  - name: Proxy settings for APT - 2
-    blockinfile:
-      path: "/etc/apt/apt.conf.d/proxy.conf"
-      block: |
-             Acquire {
-                      HTTP::proxy {{ ioi_internal_ip }}:{{ tinyproxy_port}};
-                      HTTPS::proxy {{ ioi_internal_ip }}:{{ tinyproxy_port}};
-                     }       
 
   - name: install containerd and K8s with kubeadm
     include_role:
@@ -36,14 +24,6 @@
       install_kubelet: true
       install_kubeadm: true
       install_kubectl: true
-      K8s_version: {{ K8s_version }}
       nodeType: "master"
-      pod_network_cidr: {{ vpc_cidr }}
-
-  - name: Proxy settings for APT - 1
-    file:
-      path: "./ClusterInitFiles/master.ready"
-      state: "touch"
-      mode: u=rw,g=r,o=r
-      delegate_to: localhost
+      pod_network_cidr: "{{ vpc_cidr }}"
 

@@ -42,16 +42,22 @@
      - name: Apply new settings
        command: sysctl --system
      
-     - name: update cache ~ apt-get update
-       apt:
-         update_cache: true
-
-     - name: install containerd
+     - name: install containerd apt-transpors-https curl
        apt:
          name:
          - containerd
+         - apt-transport-https
+         - curl
          state: present
+         update_cache: true
+         # update_cache_retries: 5
+         # update_cache_retry_max_delay: 20
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
 
+
+ 
      - name: Create /etc/containerd
        file:
          path: /etc/containerd
@@ -76,17 +82,13 @@
          regexp: swap
          state: absent
 
-     - name: install apt-transpors-https curl
-       apt:
-         name:
-         - apt-transport-https
-         - curl
-         state: present
-
      - name: Add the Google Cloud public signing key
        apt_key:
          url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
          state: present
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
 
      - name: Create kubernetes repo file
        apt_repository:
@@ -94,12 +96,18 @@
          state: present
          filename: kubernetes
          mode: 0600
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
 
      - name: install kubelet
        apt: 
          name:
-         - kubelet={{ K8s_version }}
+         - kubelet={{ K8s_version_ }}
          state: present
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
        when: install_kubelet 
      
      - name: enable and restart kubelet
@@ -112,20 +120,30 @@
      - name: install kubeadm
        apt:
          name:
-         - kubeadm={{ K8s_version }}
+         - kubeadm={{ K8s_version_ }}
          state: present
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
        when: install_kubeadm
 
      - name: install kubectl
        apt:
          name:
-         - kubectl={{ K8s_version }}
+         - kubectl={{ K8s_version_ }}
          state: present
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
        when: install_kubectl
  
      - name: Intilizing Kubernetes Cluster
        command: kubeadm init --pod-network-cidr "{{ pod_network_cidr }}" 
        when: nodeType == "master"
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+
 
      - name: /etc/kubernetes/admin.conf from remote to local.
        fetch:

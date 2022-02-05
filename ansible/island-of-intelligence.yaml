@@ -1,5 +1,5 @@
 - name: Island of intelligence initialization  
-  hosts: all
+  hosts: islandOfIntelligence
   gather_facts: no
   become: yes
   become_method: sudo
@@ -8,14 +8,10 @@
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
   - ./terraform_variables/tf_network_vars_file.yml
   tasks:
-  - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
     wait_for_connection:
-      delay: 10
+      delay: 1
       timeout: 300
-
-  - name: update cache ~ apt-get update
-    apt:
-      update_cache: true
 
   - name: install tinyproxy
     apt:
