@@ -19,3 +19,7 @@ variable "vpc_cidr" {
   description = "VPC IP ranges"
 }
 
+variable "tinyproxy_port" {
+  default     = "1234"
+  description = "The port listened by tinyproxy"
+}

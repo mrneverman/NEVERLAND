@@ -12,6 +12,8 @@ resource "google_compute_instance" "port-of-neverland" {
 
   tags = ["bastion"]
 
+#  depends_on = [module.nevertown]
+
   network_interface {
     subnetwork = google_compute_subnetwork.neverland-gcn-subnetwork.id
     access_config {
@@ -20,6 +22,14 @@ resource "google_compute_instance" "port-of-neverland" {
   metadata = {
     ssh-keys = "fisherman:${file("../sensitive_data/fisherman.pub")}"
   }
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  -i ${self.network_interface.0.access_config.0.nat_ip}, -u fisherman --private-key ../sensitive_data/fisherman ../ansible/port-of-neverland_init.yaml"
+  }
+
+}
+
+output "port-of-neverland-IP" {
+  value = google_compute_instance.port-of-neverland.network_interface.0.access_config.0.nat_ip
 }
 
 

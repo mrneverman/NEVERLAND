@@ -4,12 +4,9 @@
   become: yes
   become_method: sudo
   become_user: root
-  vars:
-    username: spyman
-    tinyproxy_port: "1234"
   vars_files:
-  - ./terraform_variables/tf_ansible_island-of-intelligence_vars_file.yml
-  - ./terraform_variables/tf_ansible_network_vars_file.yml
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
     wait_for_connection:
@@ -24,6 +21,7 @@
     apt:
       name:
       - tinyproxy
+      update_cache: true
       state: present
 
   - name: Ensure the tinyproxy  port is {{ tinyproxy_port }}

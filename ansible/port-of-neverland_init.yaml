@@ -1,24 +1,22 @@
 - name: Port of Neverland initialization  
-  hosts: portOfNeverland
+  hosts: all
   gather_facts: no
   become: yes
   become_method: sudo
   become_user: root
-  vars:
-    K8s_version: 1.23.3-00
-    username: fisherman
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./variables.yaml
  
+  vars:
+    username: fisherman  
+
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 10 seconds
     wait_for_connection:
       delay: 10
       timeout: 300
-
-  - name: include CreateUbuntuUser role
-    include_role:
-      name: CreateUbuntuUser
-    vars:
-      user_name: "{{ username }}"
 
   - name: update cache ~ apt-get update
     apt:
@@ -42,21 +40,28 @@
       - kubectl={{ K8s_version }}
       state: present
 
-  - name: Create directory for kube config.
-    file: 
-      path: /home/{{ username }}/.kube
-      state: directory
-      owner: "{{ username }}"
-      group: "{{ username }}"
-      mode: 0755
+#  - name: Wait for K8s master ready @ ./ClusterInitFiles/master.ready
+#    wait_for:
+#      path: ./ClusterInitFiles/master.ready
+#      state: present
+#      msg: Timeout to find file ./ClusterInitFiles/master.ready
+#     timeout: 300
 
-  - name: copy kube config file
-    copy:
-      src: ./ClusterInitFiles/admin.conf
-      dest: /home/{{ username }}/.kube/config
-      owner: "{{ username }}"
-      group: "{{ username }}"
-      mode: '0644'
+#  - name: Create directory for kube config.
+#    file: 
+#      path: /home/{{ username }}/.kube
+#      state: directory
+#      owner: "{{ username }}"
+#      group: "{{ username }}"
+#      mode: 0700
+
+#  - name: copy kube config file
+#    copy:
+#      src: ./ClusterInitFiles/admin.conf
+#      dest: /home/{{ username }}/.kube/config
+#      owner: "{{ username }}"
+#      group: "{{ username }}"
+#      mode: '0700'
 
 #  - name: install Pod network
 #    become: yes
