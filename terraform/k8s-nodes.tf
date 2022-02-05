@@ -6,7 +6,6 @@ module "nevertown" {
   instance_ansible_file = "../ansible/nevertown_init.yaml"
   tags                  = ["k8s-master", "internal"]
   subnetwork_name       = google_compute_subnetwork.neverland-gcn-subnetwork.id
-  depends_on            = [google_compute_instance.island-of-intelligence]
 }
 
 module "worktowns" {
@@ -18,7 +17,6 @@ module "worktowns" {
   tags                  = ["k8s-worker", "internal"]
   subnetwork_name       = google_compute_subnetwork.neverland-gcn-subnetwork.id
   for_each              = toset(var.worker_nodes_name)
-  depends_on            = [module.nevertown]
 }
 
 output "nevertown-IP" {

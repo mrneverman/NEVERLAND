@@ -8,3 +8,5 @@ variables_private.tf
 notes.txt
 # K8s config file and join token
 ansible/ClusterInitFiles/
+#ansible inventory
+ansible/inventory.cfg
