@@ -11,7 +11,7 @@ output "worktowns-IPs" {
 }
 
 output "island-of-intelligence-IP" {
-  value = module.island-of-intelligence.ip
+  value = google_compute_instance.island-of-intelligence.network_interface.0.access_config.0.nat_ip
 }
 
 output "port-of-neverland-IP" {

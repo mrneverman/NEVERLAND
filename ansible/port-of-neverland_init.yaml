@@ -1,5 +1,5 @@
 - name: Port of Neverland initialization  
-  hosts: all
+  hosts: portOfNeverland
   gather_facts: no
   become: yes
   become_method: sudo

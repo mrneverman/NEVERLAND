@@ -1,0 +1,28 @@
+[portOfNeverland]
+34.65.233.242
+
+[portOfNeverland:vars]
+ansible_port = 22
+ansible_user = fisherman
+ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/fisherman
+
+[islandOfIntelligence]
+34.65.22.157
+
+[islandOfIntelligence:vars]
+ansible_port = 22
+ansible_user = spyman
+ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/spyman
+
+
+[Worktowns]
+worktown-1 ansible_host=10.240.0.2 
+worktown-2 ansible_host=10.240.0.3
+worktown-3 ansible_host=10.240.0.4
+worktown-4 ansible_host=10.240.0.5
+
+[Worktowns:vars]
+ansible_port = 22
+ansible_user = kubeman
+ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/kubeman
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' -i /root/NEVERLAND/sensitive_data/fisherman -W %h:%p fisherman@34.65.233.242 "'
