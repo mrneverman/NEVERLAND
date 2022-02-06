@@ -11,6 +11,8 @@
   environment:
     http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
     https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+    no_proxy: "{{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }}"
+
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
     wait_for_connection:
@@ -25,5 +27,4 @@
       install_kubeadm: true
       install_kubectl: true
       nodeType: "master"
-      pod_network_cidr: "{{ vpc_cidr }}"
 

@@ -1,5 +1,5 @@
 [portOfNeverland]
-${portOfNeverlandIP}
+portOfNeverland ansible_host=${portOfNeverlandIP}
 
 [portOfNeverland:vars]
 ansible_port = 22
@@ -8,7 +8,7 @@ ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/fisherman
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [islandOfIntelligence]
-${islandOfIntelligenceIP}
+islandOfIntelligence ansible_host=${islandOfIntelligenceIP}
 
 [islandOfIntelligence:vars]
 ansible_port = 22
@@ -17,7 +17,7 @@ ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/spyman
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [Nevertown]
-${nevertownIP} 
+Nevertown ansible_host=${nevertownIP} 
 
 [Nevertown:vars]
 ansible_port = 22

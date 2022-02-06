@@ -66,7 +66,26 @@
      - name: Configure containerd.
        shell: /usr/bin/containerd config default > /etc/containerd/config.toml
         
-     - name: enable and restart containerd 
+     - name: Create service for containerd to use proxy - 1
+       file:
+         path: "/etc/systemd/system/containerd.service.d"
+         state: "directory"
+
+     - name: Create service for containerd to use proxy - 2
+       file:
+         path: "/etc/systemd/system/containerd.service.d/http_proxy.conf"
+         state: "touch"
+
+     - name: Configure containerd proxy service
+       blockinfile:
+         path: "/etc/systemd/system/containerd.service.d/http_proxy.conf"
+         block: |
+                [Service]
+                Environment="HTTP_PROXY=http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/"
+                Environment="HTTPS_PROXY=http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/"
+                Environment="NO_PROXY= {{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }}"
+
+     - name: enable and restart containerd
        service:
          name: containerd
          state: restarted
@@ -138,11 +157,12 @@
        when: install_kubectl
  
      - name: Intilizing Kubernetes Cluster
-       command: kubeadm init --pod-network-cidr "{{ pod_network_cidr }}" 
+       command: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}"
        when: nodeType == "master"
        environment:
          http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
          https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
+         no_proxy: "{{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }}"
 
 
      - name: /etc/kubernetes/admin.conf from remote to local.

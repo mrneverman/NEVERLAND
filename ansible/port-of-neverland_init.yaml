@@ -40,35 +40,28 @@
       - kubectl={{ K8s_version_ }}
       state: present
 
-#  - name: Wait for K8s master ready @ ./ClusterInitFiles/master.ready
-#    wait_for:
-#      path: ./ClusterInitFiles/master.ready
-#      state: present
-#      msg: Timeout to find file ./ClusterInitFiles/master.ready
-#     timeout: 300
+  - name: Create directory for kube config.
+    file: 
+      path: /home/{{ username }}/.kube
+      state: directory
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: 0700
 
-#  - name: Create directory for kube config.
-#    file: 
-#      path: /home/{{ username }}/.kube
-#      state: directory
-#      owner: "{{ username }}"
-#      group: "{{ username }}"
-#      mode: 0700
+  - name: copy kube config file
+    copy:
+      src: ./ClusterInitFiles/admin.conf
+      dest: /home/{{ username }}/.kube/config
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: '0700'
 
-#  - name: copy kube config file
-#    copy:
-#      src: ./ClusterInitFiles/admin.conf
-#      dest: /home/{{ username }}/.kube/config
-#      owner: "{{ username }}"
-#      group: "{{ username }}"
-#      mode: '0700'
-
-#  - name: install Pod network
-#    become: yes
-#    become_user: "{{ username }}"
-#    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml 
-#    args:
-#      chdir: $HOME
+  - name: install Pod network
+    become: yes
+    become_user: "{{ username }}"
+    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml 
+    args:
+      chdir: $HOME
 
   - name: Configure kubectl command auto-completion and aliases.
     blockinfile:
@@ -93,10 +86,3 @@
         set expandtab
         set tabstop=2
         set shiftwidth=2
-  - name: Copy ssh key for internal nodes
-    copy:
-      src: ../sensitive_data/kubeman
-      dest: /home/{{ username }}/.ssh/
-      owner: "{{ username }}"
-      group: "{{ username }}"
-      mode: '0400'

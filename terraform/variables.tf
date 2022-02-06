@@ -19,6 +19,16 @@ variable "vpc_cidr" {
   description = "VPC IP ranges"
 }
 
+variable "vpc_pod_cidr" {
+  default     = "10.1.0.0/18"
+  description = "VPC POD IP ranges"
+}
+
+variable "vpc_svc_cidr" {
+  default     = "10.2.0.0/20"
+  description = "VPC Service IP ranges"
+}
+
 variable "tinyproxy_port" {
   default     = "1234"
   description = "The port listened by tinyproxy"
