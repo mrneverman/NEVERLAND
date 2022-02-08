@@ -15,10 +15,17 @@ There is only one motto here: Everything As Code!!
 
 - ##### AN.0 :
 Neverland is created by Mr.Neverman in AN.0 with the inspiration of [Republic of Rose Island](https://en.wikipedia.org/wiki/Republic_of_Rose_Island) created by the Italian engineer Giorgio Rosa. It is created to work and get experience on the latest trends in cloud native technologies in a fun way. All infrastructure components are provisioned by Terraform and live on Google Cloud platform. Thanks to IaC approches, they can be mapped to other cloud providers(AWS, Azure, DigitalOcean etc) with a minimal effort. Once the infrastructure is provisioned via Terraform, Ansible comes into play for configuration managements and deployments. Each island represents a separate virtual machine. At the initial phase of the development, all islands(VMs) were created using Ubuntu OS image which is provided by Goggle Cloud. Number of Workertowns can be dynamically provisioned and configured in case of the increase in workloads.
+- ##### AN.1 :
+ In AN.1, below items completed.
+- [Google Cloud VPC and  subnet configurations](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/terraform/network_firewall.tf "Google Cloud VPC and  subnet configurations") were created.
+- [Firewall rules were created.](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/terraform/network_firewall.tf "Firewall rules were created.")
+- "The Great Port of Neverland"  configured as a bastion node and it can be accessed via private key of "fisherman" user.
+- Nevertown and Worktown(s) are in internal network now and there is not any public/external IP to access. They can be only accessed through "The Great Port of Neverland" by using their own private key of "kubeman" user.
+- [Tinyproxy](http://tinyproxy.github.io/ "Tinyproxy") was installed in "Island of Intelligence" as a transparent proxy and it can be accessed via private key of "spyman"user.
+- Terraform creates an Ansible inventory file by using Terraform [templatefile](https://www.terraform.io/language/functions/templatefile "templatefile") function. Sample inventory file can accessed via this [link](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/ansible/inventory_sample.cfg "link").
 
 ## Technology Roadmap of Neverland
 Items in the technology roadmap of Neverland are listed  below in unordered way.
-- VPC and Firewall implementation.
 - Prometheus and Grafana implementation in "Island of Intelligence".
 - ETCD encryption.
 - Ingress Controller
