@@ -8,10 +8,6 @@
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
   - ./terraform_variables/tf_network_vars_file.yml
   - ./variables.yaml
-  environment:
-    http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
-    https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
-    no_proxy: "{{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }}"
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds

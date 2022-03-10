@@ -83,7 +83,7 @@
                 [Service]
                 Environment="HTTP_PROXY=http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/"
                 Environment="HTTPS_PROXY=http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/"
-                Environment="NO_PROXY= {{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }}"
+                Environment="NO_PROXY={{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }},.svc,local,localhost,istio-sidecar-injector.istio-system.svc"
 
      - name: enable and restart containerd
        service:
@@ -159,11 +159,6 @@
      - name: Intilizing Kubernetes Cluster
        command: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}"
        when: nodeType == "master"
-       environment:
-         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
-         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
-         no_proxy: "{{ vpc_cidr }},{{ vpc_pod_cidr }},{{ vpc_svc_cidr }}"
-
 
      - name: /etc/kubernetes/admin.conf from remote to local.
        fetch:
