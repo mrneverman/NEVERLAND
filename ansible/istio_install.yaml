@@ -1,0 +1,38 @@
+- name: istioctl installation
+  hosts: portOfNeverland
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  become_user: root
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+  vars:
+    istio_version: 1.13.2
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    wait_for_connection:
+      delay: 1
+      timeout: 300
+
+  - name: Download and Unarchive istio
+    unarchive:
+      src: https://github.com/istio/istio/releases/download/{{ istio_version }}/istio-{{ istio_version }}-linux-amd64.tar.gz
+      dest: /opt
+      remote_src: yes
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Create sym link for istioctl
+    file:
+      src: /opt/istio-{{ istio_version }}/bin/istioctl
+      dest: /usr/local/bin/istioctl
+      state: link
+
+  - name: Install istio
+    become_user: fisherman
+    command: istioctl install --set profile=default -y
+
