@@ -29,6 +29,7 @@ resource "local_file" "tf_network_vars_file_new" {
     vpc_cidr: ${var.vpc_cidr}
     vpc_pod_cidr: ${var.vpc_pod_cidr}
     vpc_svc_cidr: ${var.vpc_svc_cidr}
+    istioingressgateway_port: ${var.istioingressgateway_port}
     DOC
   filename = "../ansible/terraform_variables/tf_network_vars_file.yml"
 }
@@ -97,5 +98,30 @@ resource "google_compute_firewall" "allow-bastion-to-k8s-api" {
 
   target_tags = ["k8s-master"]
   source_tags = ["bastion"]
+}
+
+resource "google_compute_firewall" "allow-reverse-proxy-to-istio-ingressgateway" {
+  name    = "allow-reverse-proxy-to-istio-ingressgateway"
+  network = google_compute_network.neverland-gcn.id
+
+  allow {
+    protocol = "tcp"
+    ports    = [var.istioingressgateway_port]
+  }
+
+  target_tags = ["internal"]
+  source_tags = ["proxy"]
+}
+
+resource "google_compute_firewall" "reverse-proxy-internet-access" {
+  name    = "reverse-proxy-internet-access"
+  network = google_compute_network.neverland-gcn.id
+
+  allow {
+    protocol = "all"
+  }
+
+  target_tags   = ["ioi"]
+  source_ranges = ["0.0.0.0/0"]
 }
 
