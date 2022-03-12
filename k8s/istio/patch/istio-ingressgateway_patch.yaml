@@ -1,0 +1,16 @@
+# patch istio ingress gateway service
+# istio-system/istio-ingressgateway
+spec:
+  ports:
+  - name: http2
+    nodePort: 31127
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  - name: https
+    nodePort: 31128
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+  type: NodePort
+
