@@ -36,3 +36,52 @@
     become_user: fisherman
     command: istioctl install --set profile=default -y
 
+  - name: Copy istio yamls dir to remote
+    copy:
+     src: ../k8s/istio
+     dest: /tmp
+     mode: 0755
+
+  - name: Apply istio-system/istio-ingressgateway svc patch file
+    become_user: fisherman
+    command: kubectl -n istio-system patch svc istio-ingressgateway --patch-file /tmp/istio/patch/istio-ingressgateway_patch.yaml
+
+  - name: Change auth method of kiali as token based  
+    replace:
+      path: /opt/istio-{{ istio_version }}/samples/addons/kiali.yaml
+      regexp: 'anonymous'
+      replace: token
+
+  - name: Install Kiali dashboard
+    become_user: fisherman
+    command: kubectl apply -f /opt/istio-{{ istio_version }}/samples/addons
+
+  - name: Replace IP in gateway.yaml
+    replace:
+      path: /tmp/istio/new_resources/gateway.yaml
+      regexp: 'ReplaceIP'
+      replace: "{{ nevertown_internal_ip }}"
+
+  - name: Replace IP in virtualservice.yaml
+    replace:
+      path: /tmp/istio/new_resources/virtualservice.yaml
+      regexp: 'ReplaceIP'
+      replace: "{{ nevertown_internal_ip }}"
+
+  - name: Apply new k8s resources
+    become_user: fisherman
+    command: kubectl apply -f /tmp/istio/new_resources
+
+  - name: Delete istio yamls dir from remote
+    file:
+     path: /tmp/istio
+     state: absent
+  
+  - name: Get kiali service account token
+    become_user: fisherman
+    shell:  kubectl -n istio-system get secrets $(kubectl -n istio-system get sa kiali -ojsonpath='{.secrets[0].name}') -ojsonpath='{.data.token}'|base64 -d
+    register: kiali_sa_token
+
+  - name: Copy kiali service account token to local file
+    local_action: copy content="{{ kiali_sa_token.stdout_lines[0] }}" dest="../sensitive_data/kiali_sa_token" mode=0777
+
