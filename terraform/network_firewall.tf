@@ -118,7 +118,8 @@ resource "google_compute_firewall" "reverse-proxy-internet-access" {
   network = google_compute_network.neverland-gcn.id
 
   allow {
-    protocol = "all"
+    protocol = "tcp"
+    ports    = ["80"]
   }
 
   target_tags   = ["ioi"]
