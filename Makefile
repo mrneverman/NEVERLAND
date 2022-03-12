@@ -13,7 +13,7 @@ Knock:
 Shine:
 	#Shine NEVERLAND: K8s cluster installation and configuration via ansible
 	cd ansible ;\
-	ansible-playbook -i inventory.cfg island-of-intelligence.yaml ;\
+	ansible-playbook -i inventory.cfg island-of-intelligence_init.yaml ;\
 	ansible-playbook -i inventory.cfg nevertown_init.yaml ;\
 	ansible-playbook -i inventory.cfg worktown_init.yaml ;\
 	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml 
