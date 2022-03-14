@@ -119,7 +119,7 @@ resource "google_compute_firewall" "reverse-proxy-internet-access" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80"]
+    ports    = ["80","443"]
   }
 
   target_tags   = ["ioi"]

@@ -35,7 +35,7 @@ variable "tinyproxy_port" {
 }
 
 variable "istioingressgateway_port" {
-  default     = "31127"
+  default     = "31128"
   description = "The port listened by tinyproxy"
 }
 
