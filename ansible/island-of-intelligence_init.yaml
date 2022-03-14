@@ -81,7 +81,7 @@
 
               backend nodes
                   mode tcp
-                  server node01 {{ nevertown_internal_ip }}:{{ istioingressgateway_port }} check check-ssl verify required verifyhost localhost ca-file /etc/haproxy/ca.crt
+                  server node01 {{ nevertown_internal_ip }}:{{ istioingressgateway_port }} check check-ssl verify required verifyhost neverland.com ca-file /etc/haproxy/ca.crt
 
   - name: Copy certificate authority certificate
     copy:
