@@ -53,47 +53,46 @@
       name: tinyproxy
       state: restarted
       enabled: yes
-  
-  - name: install nginx for reverse proxy
+
+  - name: Create NEVERLAND certificates
+    shell: |
+           openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=NEVERLAND/CN=neverland.com' -keyout ../sensitive_data/ca.key -out ../sensitive_data/ca.crt
+           openssl req -out ../sensitive_data/neverland.com.csr -newkey rsa:2048 -nodes -keyout ../sensitive_data/neverland.com.key -subj "/CN=neverland.com/O=NEVERLAND"
+           openssl x509 -req -sha256 -days 365 -CA ../sensitive_data/ca.crt -CAkey ../sensitive_data/ca.key -set_serial 0 -in ../sensitive_data/neverland.com.csr -out ../sensitive_data/neverland.com.crt
+    delegate_to: localhost
+
+  - name: install haproxy
     apt:
       name:
-      - nginx
+      - haproxy
       update_cache: true
-      state: present
-  
-  - name: Disable default virtual host
-    file:
-      path: /etc/nginx/sites-enabled/default
-      state: absent
-   
-  - name: Create nginx reverse configuration file
-    file:
-      path: /etc/nginx/sites-available/reverse-proxy.conf
-      state: touch
+      state: present 
 
-  - name: Write nginx reverse configuration to file
+  - name: Add conf for haproxy
     blockinfile:
-      path: /etc/nginx/sites-available/reverse-proxy.conf
+      path: "/etc/haproxy/haproxy.cfg"
       block: |
-             server {
-               listen 80;
-               location / {
-                 access_log /var/log/nginx/reverse-access.log;
-                 error_log /var/log/nginx/reverse-error.log;
-                 proxy_http_version 1.1;
-                 proxy_pass http://{{ nevertown_internal_ip }}:{{ istioingressgateway_port }};
-               }
-             }
+              frontend localhost
+                  bind *:80
+                  bind *:443
+                  option tcplog
+                  mode tcp
+                  default_backend nodes
 
-  - name: Link nginx reverse configuration file
-    file:
-      src: /etc/nginx/sites-available/reverse-proxy.conf
-      dest: /etc/nginx/sites-enabled/reverse-proxy.conf
-      state: link
+              backend nodes
+                  mode tcp
+                  server node01 {{ nevertown_internal_ip }}:{{ istioingressgateway_port }} check check-ssl verify required verifyhost localhost ca-file /etc/haproxy/ca.crt
 
-  - name: enable and restart nginx
+  - name: Copy certificate authority certificate
+    copy:
+      src: ../sensitive_data/ca.crt
+      dest: /etc/haproxy/ca.crt
+      mode: 0500
+
+  - name: enable and restart haproxy
     service:
-      name: nginx
+      name: haproxy
       state: restarted
       enabled: yes
+
 
