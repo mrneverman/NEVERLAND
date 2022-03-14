@@ -42,6 +42,22 @@
      dest: /tmp
      mode: 0755
 
+  - name: Copy key to remote
+    copy:
+     src: ../sensitive_data/neverland.com.key
+     dest: /tmp
+     mode: 0755
+
+  - name: Copy certificate to remote
+    copy:
+     src: ../sensitive_data/neverland.com.crt
+     dest: /tmp
+     mode: 0755
+
+  - name: Create secret for gateway TLS
+    become_user: fisherman
+    command: kubectl create -n istio-system secret tls neverland-credential --key=/tmp/neverland.com.key --cert=/tmp/neverland.com.crt
+
   - name: Apply istio-system/istio-ingressgateway svc patch file
     become_user: fisherman
     command: kubectl -n istio-system patch svc istio-ingressgateway --patch-file /tmp/istio/patch/istio-ingressgateway_patch.yaml
@@ -55,18 +71,6 @@
   - name: Install Kiali dashboard
     become_user: fisherman
     command: kubectl apply -f /opt/istio-{{ istio_version }}/samples/addons
-
-  - name: Replace IP in gateway.yaml
-    replace:
-      path: /tmp/istio/new_resources/gateway.yaml
-      regexp: 'ReplaceIP'
-      replace: "{{ nevertown_internal_ip }}"
-
-  - name: Replace IP in virtualservice.yaml
-    replace:
-      path: /tmp/istio/new_resources/virtualservice.yaml
-      regexp: 'ReplaceIP'
-      replace: "{{ nevertown_internal_ip }}"
 
   - name: Apply new k8s resources
     become_user: fisherman
