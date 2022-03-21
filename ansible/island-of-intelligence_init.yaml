@@ -59,6 +59,7 @@
            openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=NEVERLAND/CN=neverland.com' -keyout ../sensitive_data/ca.key -out ../sensitive_data/ca.crt
            openssl req -out ../sensitive_data/neverland.com.csr -newkey rsa:2048 -nodes -keyout ../sensitive_data/neverland.com.key -subj "/CN=neverland.com/O=NEVERLAND"
            openssl x509 -req -sha256 -days 365 -CA ../sensitive_data/ca.crt -CAkey ../sensitive_data/ca.key -set_serial 0 -in ../sensitive_data/neverland.com.csr -out ../sensitive_data/neverland.com.crt
+           cat ../sensitive_data/neverland.com.key ../sensitive_data/neverland.com.crt >> ../sensitive_data/neverland.com.pem
     delegate_to: localhost
 
   - name: install haproxy
@@ -74,19 +75,30 @@
       block: |
               frontend localhost
                   bind *:80
-                  bind *:443
+                  bind *:443 ssl crt  /etc/haproxy/neverland.com.pem
                   option tcplog
-                  mode tcp
+                  mode http
                   default_backend nodes
 
               backend nodes
-                  mode tcp
-                  server node01 {{ nevertown_internal_ip }}:{{ istioingressgateway_port }} check check-ssl verify required verifyhost neverland.com ca-file /etc/haproxy/ca.crt
+                  mode http
+                  http-request redirect scheme https unless { ssl_fc }
+
+
+  - name: Add conf for haproxy
+    blockinfile:
+      path: "/etc/haproxy/haproxy.cfg"
+      block: |
+              server node{{ ansible_loop.index }}  {{ item }}:{{ istioingressgateway_port }} check check-sni neverland.com sni str(neverland.com) ssl verify none
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
+    loop: "{{ worktowns_internal_ip }}"
+    loop_control:
+      extended: yes
 
   - name: Copy certificate authority certificate
     copy:
-      src: ../sensitive_data/ca.crt
-      dest: /etc/haproxy/ca.crt
+      src: ../sensitive_data/neverland.com.pem
+      dest: /etc/haproxy/neverland.com.pem
       mode: 0500
 
   - name: enable and restart haproxy
