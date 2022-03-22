@@ -49,7 +49,7 @@ Some of the make commands are:
 
 ## Technology Roadmap of Neverland
 Items in the technology roadmap of Neverland are listed  below in unordered way.
-- Prometheus and Grafana implementation in "Island of Intelligence".
+- Prometheus and Grafana implementation.
 - ETCD encryption.
 - Ingress Controller
 - Separate ETCD from Nevertown and implement it in different island for high availability and also to reduce the attack surface.
