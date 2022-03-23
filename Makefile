@@ -1,26 +1,26 @@
 Rise:
 	# Rise NEVERLAND : Create gcloud instances defined in terraform folder
-	cd terraform ;\
+	cd terraform &&\
 	terraform apply -auto-approve
 
 Knock:
 	# ansible ping all instance in NEVERLAND
 	rm ../.ssh/known_hosts ;\
-	cd ansible ;\
+	cd ansible &&\
 	ansible all -i inventory.cfg -m ping
 
 Shine:
 	#Shine NEVERLAND: K8s cluster installation and configuration via ansible
-	cd ansible ;\
-	ansible-playbook -i inventory.cfg island-of-intelligence_init.yaml ;\
-	ansible-playbook -i inventory.cfg nevertown_init.yaml ;\
-	ansible-playbook -i inventory.cfg worktown_init.yaml ;\
-	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml ;\
+	cd ansible &&\
+	ansible-playbook -i inventory.cfg island-of-intelligence_init.yaml &&\
+	ansible-playbook -i inventory.cfg nevertown_init.yaml &&\
+	ansible-playbook -i inventory.cfg worktown_init.yaml &&\
+	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml &&\
 	ansible-playbook -i inventory.cfg istio_install.yaml
 
 SinkAll:
 	#Sink All: Destroy all gcloud instances
-	cd terraform ;\
+	cd terraform &&\
 	terraform destroy -auto-approve
 
 RiseAndShine: Rise Shine
