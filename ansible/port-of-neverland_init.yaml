@@ -40,6 +40,31 @@
       - kubectl={{ K8s_version_ }}
       state: present
 
+  - name: Add helm public signing key
+    apt_key:
+      url: https://baltocdn.com/helm/signing.asc
+      state: present
+
+  - name: install apt-transport-https
+    apt:
+      name:
+      - apt-transport-https
+      state: present
+
+  - name: Create helm repo file
+    apt_repository:
+      repo: deb https://baltocdn.com/helm/stable/debian/ all main
+      state: present
+      filename: helm
+      mode: 0600
+
+  - name: install helm
+    apt:
+      name:
+      - helm
+      state: present
+      update_cache: true
+
   - name: Create directory for kube config.
     file: 
       path: /home/{{ username }}/.kube
