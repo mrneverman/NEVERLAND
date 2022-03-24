@@ -76,7 +76,7 @@
               frontend localhost
                   bind *:80
                   bind *:443 ssl crt  /etc/haproxy/neverland.com.pem
-                  option tcplog
+                  option httplog
                   mode http
                   default_backend nodes
 
