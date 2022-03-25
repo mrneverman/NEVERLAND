@@ -1,0 +1,47 @@
+- name: Deploy prometheus and grafana stack
+  hosts: portOfNeverland
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    wait_for_connection:
+      delay: 1
+      timeout: 300
+
+  - name: create monitoring namespace
+    become_user: fisherman
+    command: kubectl create namespace monitoring
+
+  - name: helm repo add prometheus-community 
+    become_user: fisherman
+    command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+  - name: helm repo update
+    become_user: fisherman
+    command: helm repo update
+
+  - name: install prometheus via helm
+    become_user: fisherman
+    command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack
+
+  - name: patch grafana deployment
+    become_user: fisherman
+    shell:
+      cmd: |
+            kubectl -n monitoring patch deployments.apps k8spromethuesstack-grafana --patch-file=/dev/stdin <<-EOF
+                            spec:
+                              template:
+                                spec:
+                                  containers:
+                                  - env:
+                                    - name: GF_SERVER_ROOT_URL
+                                      value: '%(protocol)s://%(domain)s:/grafana/'
+                                    - name: GF_SERVER_DOMAIN
+                                      value: neverland.com
+                                    - name: GF_SERVER_SERVE_FROM_SUB_PATH
+                                      value: "true"
+                                    name: grafana
+            EOF
