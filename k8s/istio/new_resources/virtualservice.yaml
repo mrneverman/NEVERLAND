@@ -11,9 +11,32 @@ spec:
   - match:
     - uri:
         prefix: /kiali
+    name: KialiDashboard
     route:
     - destination:
         port:
           number: 20001
         host: kiali.istio-system.svc.cluster.local
+  - match:
+    - uri:
+        prefix: /prometheus/
+    name: PrometheusDashboard
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: k8spromethuesstack-kube-pr-prometheus.monitoring.svc.cluster.local
+        port:
+          number: 9090
+  - match:
+    - uri:
+        prefix: /grafana/
+    name: GrafanaDashboard
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: k8spromethuesstack-grafana.monitoring.svc.cluster.local
+        port:
+          number: 80
 
