@@ -25,7 +25,7 @@
 
   - name: install prometheus via helm
     become_user: fisherman
-    command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack --set prometheus.prometheusSpec.externalUrl=/prometheus/
+    command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack --set prometheus.prometheusSpec.externalUrl=/prometheus/ --set grafana.adminPassword=admin
 
   - name: patch grafana deployment
     become_user: fisherman
