@@ -21,6 +21,6 @@
     vars:
       install_kubelet: true
       install_kubeadm: true
-      install_kubectl: true
+      install_kubectl: false
       nodeType: "master"
 
