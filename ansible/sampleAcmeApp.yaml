@@ -1,0 +1,75 @@
+# Based on https://github.com/vmwarecloudadvocacy/acme_fitness_demo
+- name: Deploy sample Acme App
+  hosts: portOfNeverland
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    wait_for_connection:
+      delay: 1
+      timeout: 300
+
+  - name: create sampleapp namespace 
+    become_user: fisherman
+    command: kubectl create namespace sampleapp
+ 
+  - name: label sampleapp namespace for istio side-car injection
+    become_user: fisherman
+    command: kubectl label namespace sampleapp istio-injection=enabled
+
+  - name: create secrets
+    become_user: fisherman
+    shell:
+      cmd: |
+            kubectl -n sampleapp create secret generic cart-redis-pass --from-literal=password=pass
+            kubectl -n sampleapp create secret generic catalog-mongo-pass --from-literal=password=pass
+            kubectl -n sampleapp create secret generic order-postgres-pass --from-literal=password=pass
+            kubectl -n sampleapp create secret generic users-mongo-pass --from-literal=password=pass
+            kubectl -n sampleapp create secret generic users-redis-pass --from-literal=password=pass
+
+  - name: Copy sample app  yamls dir to remote
+    copy:
+     src: ../k8s/sampleAcmeApp/
+     dest: /tmp
+     mode: 0755
+
+  - name: Apply new k8s resources
+    become_user: fisherman
+    command: kubectl -n sampleapp apply -f /tmp/sampleAcmeApp/
+
+  - name: Delete sample app yamls dir from remote
+    file:
+     path: /tmp/sampleAcmeApp/
+     state: absent
+
+  - name: deploy sampleapp virtual service
+    become_user: fisherman
+    shell:
+      cmd: |
+           cat <<EOF | kubectl apply -f -
+                      apiVersion: networking.istio.io/v1alpha3
+                      kind: VirtualService
+                      metadata:
+                        name: sampleappvirtualservice
+                      spec:
+                        hosts:
+                        - neverland.com
+                        gateways:
+                        - neverlandgateway
+                        http:
+                        - match:
+                          - uri:
+                              prefix: /
+                          name: sampleapp
+                          rewrite:
+                            uri: /
+                          route:
+                          - destination:
+                              host: frontend.sampleapp.svc.cluster.local
+                              port:
+                                number: 80
+                 EOF
+
