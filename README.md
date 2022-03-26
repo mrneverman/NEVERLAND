@@ -44,7 +44,7 @@ Some of the make commands are:
   For the full list of make commands check the Makefile via [Link](https://github.com/mrneverman/NEVERLAND/blob/main/Makefile "Link")
 - Istio service mesh were installed, and Istio ingress gateway service were configured as NodePort to access the application which are deployed in Neverland.
 - istioctl utility was installed in "The Great Port of Neverland".
-- [HAProxy](http://www.haproxy.org/ "HAProxy") were installed and configured in "Island of Intelligence”to serve as reverse proxy and load balancer. NodePort of Istio ingress gateway in worktowns are configured as a [backend](https://github.com/mrneverman/NEVERLAND/blob/main/ansible/island-of-intelligence_init.yaml#L88 "backend") server.
+- [HAProxy](http://www.haproxy.org/ "HAProxy") were installed and configured in "Island of Intelligence”to serve as a layer-7 reverse proxy and load balancer. NodePort of Istio ingress gateway in worktowns are configured as a [backend](https://github.com/mrneverman/NEVERLAND/blob/main/ansible/island-of-intelligence_init.yaml#L88 "backend") server.
 - Self-signed [certificates](https://github.com/mrneverman/NEVERLAND/blob/c797b49a67b65703c0d48023619ea164fb742fd5/ansible/island-of-intelligence_init.yaml#L57 "certificates") were created for neverland.com and used for traffic encryption in HAProxy and Istio Gateway.
 
 ## Technology Roadmap of Neverland
