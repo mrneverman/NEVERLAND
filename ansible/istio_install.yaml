@@ -31,10 +31,21 @@
       src: /opt/istio-{{ istio_version }}/bin/istioctl
       dest: /usr/local/bin/istioctl
       state: link
+  
+  - name: Copy istio_config.yaml
+    copy:
+     src: istio_config.yaml
+     dest: /tmp
+     mode: 0755
 
   - name: Install istio
     become_user: fisherman
-    command: istioctl install --set profile=default -y
+    command: istioctl install --set profile=default -f /tmp/istio_config.yaml -y
+
+  - name: Delete istio_config.yaml
+    file:
+     path: /tmp/istio_config.yaml
+     state: absent
 
   - name: Copy istio yamls dir to remote
     copy:
@@ -67,6 +78,24 @@
       path: /opt/istio-{{ istio_version }}/samples/addons/kiali.yaml
       regexp: 'anonymous'
       replace: token
+
+  - name: Configure yaml for tolerations & nodeselector
+    blockinfile:
+      path: "{{ item }}"
+      insertbefore: containers
+      block: |2
+              nodeSelector:
+                kubernetes.io/hostname: monitortown
+              tolerations:
+              - key: "purpose"
+                operator: "Equal"
+                value: "monitoring"
+                effect: "NoSchedule"
+    with_items:
+    - /opt/istio-{{ istio_version }}/samples/addons/kiali.yaml
+    - /opt/istio-{{ istio_version }}/samples/addons/grafana.yaml
+    - /opt/istio-{{ istio_version }}/samples/addons/jaeger.yaml
+    - /opt/istio-{{ istio_version }}/samples/addons/prometheus.yaml
 
   - name: Install Kiali dashboard
     become_user: fisherman
