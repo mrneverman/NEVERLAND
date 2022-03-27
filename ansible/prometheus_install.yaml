@@ -23,9 +23,20 @@
     become_user: fisherman
     command: helm repo update
 
+  - name: Copy prometheus_values.yaml
+    copy:
+     src: prometheus_values.yaml
+     dest: /tmp
+     mode: 0755
+
   - name: install prometheus via helm
     become_user: fisherman
-    command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack --set prometheus.prometheusSpec.externalUrl=/prometheus/ --set grafana.adminPassword=admin
+    command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack -f /tmp/prometheus_values.yaml
+
+  - name: Delete prometheus_values.yaml
+    file:
+     path: /tmp/prometheus_values.yaml
+     state: absent
 
   - name: patch grafana deployment
     become_user: fisherman
