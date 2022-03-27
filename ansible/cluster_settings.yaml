@@ -1,0 +1,25 @@
+- name: Deploy prometheus and grafana stack
+  hosts: portOfNeverland
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    wait_for_connection:
+      delay: 1
+      timeout: 300
+
+  - name: taint monitortown
+    become_user: fisherman
+    command: kubectl taint node monitortown purpose=monitoring:NoSchedule
+
+  - name: metrics-server install
+    become_user: fisherman
+    command: kubectl -n monitortown apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+  - name: approve pending certificate
+    become_user: fisherman
+    command: kubectl get csr |grep Pending|awk '{print $1}' | xargs kubectl certificate approve
+
