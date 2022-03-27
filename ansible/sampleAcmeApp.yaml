@@ -32,7 +32,7 @@
 
   - name: Copy sample app  yamls dir to remote
     copy:
-     src: ../k8s/sampleAcmeApp/
+     src: ../k8s/sampleAcmeApp
      dest: /tmp
      mode: 0755
 
@@ -44,6 +44,23 @@
     file:
      path: /tmp/sampleAcmeApp/
      state: absent
+
+  - name: create hpa
+    become_user: fisherman
+    shell:
+      cmd: |
+            kubectl -n sampleapp autoscale deployment cart --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment cart-redis --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment catalog --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment catalog-mongo --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment frontend --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment order --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment order-postgres --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment payment --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment pos --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment users --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment users-mongo --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment users-redis --max=10 --min=1 --cpu-percent=80
 
   - name: deploy sampleapp virtual service
     become_user: fisherman
