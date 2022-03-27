@@ -1,4 +1,4 @@
-- name: Deploy prometheus and grafana stack
+- name: Cluster Settings
   hosts: portOfNeverland
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
