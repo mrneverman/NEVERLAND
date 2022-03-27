@@ -155,11 +155,11 @@
          http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
          https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port}}/
        when: install_kubectl
- 
-     - name: Intilizing Kubernetes Cluster
-       command: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}"
-       when: nodeType == "master"
 
+     - name: Intilizing Kubernetes Cluster
+       command: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}" 
+       when: nodeType == "master"
+ 
      - name: /etc/kubernetes/admin.conf from remote to local.
        fetch:
          src: /etc/kubernetes/admin.conf
@@ -201,3 +201,15 @@
          path: /tmp/kubernetes_join_command
          state: absent
        when: nodeType == "worker"
+
+     - name: Insert a line at the end of /var/lib/kubelet/config.yaml
+       lineinfile:
+         path: /var/lib/kubelet/config.yaml
+         line: 'serverTLSBootstrap: true'
+
+     - name: restart kubelet
+       service:
+         name: kubelet
+         state: restarted
+       when: install_kubelet
+
