@@ -38,6 +38,13 @@ spec:
       containers:
       - image: gcr.io/vmwarecloudadvocacy/acmeshop-payment:latest
         name: payment
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+          limits:
+            cpu: "200m"
+            memory: "200Mi"
         env:
         - name: PAYMENT_PORT
           value: '9000'

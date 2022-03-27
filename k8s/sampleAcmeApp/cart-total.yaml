@@ -42,6 +42,13 @@ spec:
       - image: gcr.io/vmwarecloudadvocacy/acmeshop-cart:latest
         imagePullPolicy: "Always"
         name: cart
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+          limits:
+            cpu: "200m"
+            memory: "200Mi"
         env:
         - name: REDIS_HOST
           value: 'cart-redis.sampleapp.svc.cluster.local'

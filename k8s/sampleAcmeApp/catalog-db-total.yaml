@@ -37,7 +37,12 @@ spec:
         - name: catalog-mongo
           image: mongo:4
           resources:
-            {}
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+            limits:
+              cpu: "200m"
+              memory: "200Mi"
           ports:
             - name: catalog-mongo
               containerPort: 27017

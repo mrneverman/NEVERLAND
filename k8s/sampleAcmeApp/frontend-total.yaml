@@ -40,6 +40,10 @@ spec:
       containers:
       - image: gcr.io/vmwarecloudadvocacy/acmeshop-front-end:latest
         name: frontend
+        resources:
+            requests:
+              cpu: "100m"
+              memory: "250Mi"
         env:
         - name: FRONTEND_PORT
           value: '3000'
