@@ -7,7 +7,8 @@ variable "worker_nodes_name" {
 */
 variable "worker_nodes_name" {
   type = list(any)
-  default = ["worktown-1",
+  default = ["monitortown",
+    "worktown-1",
     "worktown-2",
     "worktown-3",
   "worktown-4"]
