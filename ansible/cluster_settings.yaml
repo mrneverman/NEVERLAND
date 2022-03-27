@@ -11,15 +11,16 @@
       delay: 1
       timeout: 300
 
-  - name: taint monitortown
-    become_user: fisherman
-    command: kubectl taint node monitortown purpose=monitoring:NoSchedule
+#  - name: taint monitortown
+#    become_user: fisherman
+#    command: kubectl taint node monitortown purpose=monitoring:NoSchedule
 
   - name: metrics-server install
     become_user: fisherman
-    command: kubectl -n monitortown apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+    command: kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
   - name: approve pending certificate
     become_user: fisherman
-    command: kubectl get csr |grep Pending|awk '{print $1}' | xargs kubectl certificate approve
+    shell:
+      cmd: kubectl get csr | grep Pending | awk '{print $1}' | xargs kubectl certificate approve
 
