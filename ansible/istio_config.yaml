@@ -2,8 +2,6 @@ apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
   profile: default
-  hub: gcr.io/istio-testing
-  tag: latest
   components:
     pilot:
       k8s:

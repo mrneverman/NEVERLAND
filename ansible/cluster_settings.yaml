@@ -11,9 +11,43 @@
       delay: 1
       timeout: 300
 
-#  - name: taint monitortown
-#    become_user: fisherman
-#    command: kubectl taint node monitortown purpose=monitoring:NoSchedule
+  - name: taint monitortown
+    become_user: fisherman
+    command: kubectl taint node monitortown purpose=monitoring:NoSchedule
+
+  - name: install Pod network
+    become: yes
+    become_user: fisherman
+    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
+    args:
+      chdir: $HOME
+
+  - name: create monitoring namespace
+    become_user: fisherman
+    command: kubectl create namespace monitoring
+
+  - name: helm repo add metrics-server
+    become_user: fisherman
+    command: helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+
+  - name: helm repo update
+    become_user: fisherman
+    command: helm repo update
+
+  - name: Copy metrics-server_values.yaml
+    copy:
+     src: metrics-server_values.yaml
+     dest: /tmp
+     mode: 0755
+
+  - name: install metrics-server via helm
+    become_user: fisherman
+    command: helm install --namespace monitoring metrics-server metrics-server/metrics-server -f /tmp/metrics-server_values.yaml
+
+  - name: Delete metrics-server_values.yaml
+    file:
+     path: /tmp/metrics-server_values.yaml
+     state: absent
 
   - name: metrics-server install
     become_user: fisherman
