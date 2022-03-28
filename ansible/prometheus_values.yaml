@@ -2,9 +2,6 @@ prometheus:
   prometheusSpec:
     externalUrl: /prometheus/ 
 
-grafana:
-  adminPassword: admin
-
 alertmanager:
   alertmanagerSpec:
     nodeSelector:
@@ -15,6 +12,7 @@ alertmanager:
       value: "monitoring"
       effect: "NoSchedule"
 grafana:
+  adminPassword: admin
   nodeSelector:
     kubernetes.io/hostname: monitortown
   tolerations:

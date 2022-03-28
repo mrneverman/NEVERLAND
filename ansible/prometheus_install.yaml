@@ -11,10 +11,6 @@
       delay: 1
       timeout: 300
 
-  - name: create monitoring namespace
-    become_user: fisherman
-    command: kubectl create namespace monitoring
-
   - name: helm repo add prometheus-community 
     become_user: fisherman
     command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
