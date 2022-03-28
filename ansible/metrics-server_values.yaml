@@ -1,0 +1,8 @@
+nodeSelector:
+  kubernetes.io/hostname: monitortown
+tolerations:
+- key: "purpose"
+  operator: "Equal"
+  value: "monitoring"
+  effect: "NoSchedule"
+
