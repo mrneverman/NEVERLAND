@@ -81,13 +81,6 @@
       group: "{{ username }}"
       mode: '0700'
 
-  - name: install Pod network
-    become: yes
-    become_user: "{{ username }}"
-    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml 
-    args:
-      chdir: $HOME
-
   - name: Configure kubectl command auto-completion and aliases.
     blockinfile:
       path: /home/{{ username }}/.bashrc
