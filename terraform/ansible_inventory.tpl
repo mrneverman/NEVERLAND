@@ -29,6 +29,9 @@ ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'F
 %{ for name, ip in worktownsIP}
 ${name} ansible_host=${ip}
 %{ endfor ~}
+%{ for name, ip in infratownsIP}
+${name} ansible_host=${ip}
+%{ endfor ~}
 
 [Worktowns:vars]
 ansible_port = 22

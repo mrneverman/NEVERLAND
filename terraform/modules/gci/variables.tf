@@ -20,11 +20,3 @@ variable "tags" {
 
 }
 
-variable "instance_ansible_file" {
-  description = " name of the ansible file which will be run once the instance created"
-}
-
-variable "bastion_ip" {
-  description = "bastion ip for ssh proxy jump"
-
-}

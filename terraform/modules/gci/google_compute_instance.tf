@@ -14,13 +14,13 @@ resource "google_compute_instance" "gci" {
 
   network_interface {
     subnetwork = var.subnetwork_name
-    /* 
+    /* disabled not to have public ip
    access_config {
     }
 */
   }
   metadata = {
-    ssh-keys = "${var.ssh_user}:${file("../sensitive_data/kubeman.pub")}"
+    ssh-keys = "${var.ssh_user}:${file("../sensitive_data/${var.ssh_user}.pub")}"
   }
 }
 

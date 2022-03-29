@@ -7,6 +7,9 @@ resource "local_file" "ansible_inventory" {
       worktownsIP = {
         for name in var.worker_nodes_name : name => module.worktowns[name].ip
       }
+      infratownsIP = {
+        for name in var.infrastructure_nodes_name : name => module.infratowns[name].ip
+      }
 
     }
   )

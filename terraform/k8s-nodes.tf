@@ -1,32 +1,43 @@
 module "nevertown" {
-  source                = "./modules/gci"
-  instance_name         = "nevertown"
-  ssh_user              = var.ssh_user
-  bastion_ip            = google_compute_instance.port-of-neverland.network_interface.0.access_config.0.nat_ip
-  instance_ansible_file = "../ansible/nevertown_init.yaml"
-  tags                  = ["k8s-master", "internal"]
-  subnetwork_name       = google_compute_subnetwork.neverland-gcn-subnetwork.id
+  source          = "./modules/gci"
+  instance_name   = "nevertown"
+  ssh_user        = "kubeman"
+  tags            = ["k8s-master", "internal"]
+  subnetwork_name = google_compute_subnetwork.neverland-gcn-subnetwork.id
 }
 
 module "worktowns" {
-  source                = "./modules/gci"
-  instance_name         = each.key
-  ssh_user              = var.ssh_user
-  bastion_ip            = google_compute_instance.port-of-neverland.network_interface.0.access_config.0.nat_ip
-  instance_ansible_file = "../ansible/worktown_init.yaml"
-  tags                  = ["k8s-worker", "internal"]
-  subnetwork_name       = google_compute_subnetwork.neverland-gcn-subnetwork.id
-  for_each              = toset(var.worker_nodes_name)
+  source          = "./modules/gci"
+  instance_name   = each.key
+  ssh_user        = "kubeman"
+  tags            = ["k8s-worker", "internal"]
+  subnetwork_name = google_compute_subnetwork.neverland-gcn-subnetwork.id
+  for_each        = toset(var.worker_nodes_name)
+}
+
+module "infratowns" {
+  source          = "./modules/gci"
+  instance_name   = each.key
+  ssh_user        = "kubeman"
+  tags            = ["k8s-worker", "internal", "infratown"]
+  subnetwork_name = google_compute_subnetwork.neverland-gcn-subnetwork.id
+  for_each        = toset(var.infrastructure_nodes_name)
 }
 
 output "nevertown-IP" {
   value = module.nevertown.ip
 }
 
-
 output "worktowns-IPs" {
   value = {
     for name in var.worker_nodes_name : name => module.worktowns[name].ip
+  }
+
+}
+
+output "infratowns-IPs" {
+  value = {
+    for name in var.infrastructure_nodes_name : name => module.infratowns[name].ip
   }
 
 }
@@ -41,6 +52,17 @@ resource "local_file" "tf_k8node_vars_file_new" {
     %{for name in var.worker_nodes_name~}
       - ${module.worktowns[name].ip}
     %{endfor~}
+
+    infratowns_internal_ip:
+    %{for name in var.infrastructure_nodes_name~}
+      - ${module.infratowns[name].ip}
+    %{endfor~}
+
+    infrastructure_nodes:
+    %{for name in var.infrastructure_nodes_name~}
+      - "${name}"
+    %{endfor~}
+
     DOC
   filename = "../ansible/terraform_variables/tf_k8node_vars_file.yml"
 }

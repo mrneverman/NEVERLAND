@@ -1,19 +1,20 @@
-/*
-variable "worker_nodes_name" {
-  type        = list(any)
-  default     = ["worktown-1"]
-  description = "Name of worker nodes"
-}
-*/
 variable "worker_nodes_name" {
   type = list(any)
-  default = ["monitortown",
-    "worktown-1",
+  default = ["worktown-1",
     "worktown-2",
     "worktown-3",
   "worktown-4"]
   description = "Name of worker nodes"
 }
+
+variable "infrastructure_nodes_name" {
+  type = list(any)
+  default = ["infratown-1",
+  "infratown-2"]
+  description = "Name of infrastructure nodes that will host monitoring, istio daemon and related pods. "
+}
+
+
 
 variable "vpc_cidr" {
   default     = "10.240.0.0/24"
