@@ -4,53 +4,62 @@ prometheus:
 
 alertmanager:
   alertmanagerSpec:
+    replicas: 2
     nodeSelector:
-      kubernetes.io/hostname: monitortown
+      purpose: infratown
     tolerations:
     - key: "purpose"
       operator: "Equal"
-      value: "monitoring"
+      value: "infratown"
       effect: "NoSchedule"
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
 grafana:
   adminPassword: admin
   nodeSelector:
-    kubernetes.io/hostname: monitortown
+    purpose: infratown
   tolerations:
   - key: "purpose"
     operator: "Equal"
-    value: "monitoring"
+    value: "infratown"
     effect: "NoSchedule"
 kube-state-metrics:
  nodeSelector:
-   kubernetes.io/hostname: monitortown
+   purpose: infratown
  tolerations:
  - key: "purpose"
    operator: "Equal"
-   value: "monitoring"
+   value: "infratown"
    effect: "NoSchedule"
 prometheus:
   prometheusSpec:
+    replicas: 2
     nodeSelector:
-      kubernetes.io/hostname: monitortown
+      purpose: infratown
     tolerations:
     - key: "purpose"
       operator: "Equal"
-      value: "monitoring"
+      value: "infratown"
       effect: "NoSchedule"
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
 prometheusOperator:
   admissionWebhooks:
     nodeSelector:
-      kubernetes.io/hostname: monitortown
+      purpose: infratown
     tolerations:
     - key: "purpose"
       operator: "Equal"
-      value: "monitoring"
+      value: "infratown"
       effect: "NoSchedule"
   nodeSelector:
-    kubernetes.io/hostname: monitortown
+    purpose: infratown
   tolerations:
   - key: "purpose"
     operator: "Equal"
-    value: "monitoring"
+    value: "infratown"
     effect: "NoSchedule"
 

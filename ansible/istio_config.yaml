@@ -6,10 +6,10 @@ spec:
     pilot:
       k8s:
         nodeSelector:
-          kubernetes.io/hostname: monitortown
+          purpose: infratown
         tolerations:
         - key: "purpose"
           operator: "Equal"
-          value: "monitoring"
+          value: "infratown"
           effect: "NoSchedule"
 

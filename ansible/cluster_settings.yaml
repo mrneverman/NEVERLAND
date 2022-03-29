@@ -1,5 +1,6 @@
 - name: Cluster Settings
   hosts: portOfNeverland
+  become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
   - ./terraform_variables/tf_network_vars_file.yml
@@ -11,27 +12,26 @@
       delay: 1
       timeout: 300
 
-  - name: taint monitortown
-    become_user: fisherman
-    command: kubectl taint node monitortown purpose=monitoring:NoSchedule
+  - name: taint infrastructure town
+    command: kubectl taint node {{item}} purpose=infratown:NoSchedule
+    loop: "{{infrastructure_nodes}}"
+
+  - name: taint infrastructure town
+    command: kubectl label node {{item}} purpose=infratown
+    loop: "{{infrastructure_nodes}}"
 
   - name: install Pod network
-    become: yes
-    become_user: fisherman
     shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
     args:
       chdir: $HOME
 
   - name: create monitoring namespace
-    become_user: fisherman
     command: kubectl create namespace monitoring
 
   - name: helm repo add metrics-server
-    become_user: fisherman
     command: helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 
   - name: helm repo update
-    become_user: fisherman
     command: helm repo update
 
   - name: Copy metrics-server_values.yaml
@@ -41,7 +41,6 @@
      mode: 0755
 
   - name: install metrics-server via helm
-    become_user: fisherman
     command: helm install --namespace monitoring metrics-server metrics-server/metrics-server -f /tmp/metrics-server_values.yaml
 
   - name: Delete metrics-server_values.yaml
@@ -49,12 +48,7 @@
      path: /tmp/metrics-server_values.yaml
      state: absent
 
-  - name: metrics-server install
-    become_user: fisherman
-    command: kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
   - name: approve pending certificate
-    become_user: fisherman
     shell:
       cmd: kubectl get csr | grep Pending | awk '{print $1}' | xargs kubectl certificate approve
 

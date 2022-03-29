@@ -40,7 +40,7 @@
 
   - name: Install istio
     become_user: fisherman
-    command: istioctl install --set profile=default -f /tmp/istio_config.yaml -y
+    command: istioctl install -f /tmp/istio_config.yaml -y
 
   - name: Delete istio_config.yaml
     file:
@@ -85,11 +85,11 @@
       insertbefore: containers
       block: |2
               nodeSelector:
-                kubernetes.io/hostname: monitortown
+                purpose: infratown
               tolerations:
               - key: "purpose"
                 operator: "Equal"
-                value: "monitoring"
+                value: "infratown"
                 effect: "NoSchedule"
     with_items:
     - /opt/istio-{{ istio_version }}/samples/addons/kiali.yaml

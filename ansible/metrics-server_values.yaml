@@ -1,8 +1,11 @@
 nodeSelector:
-  kubernetes.io/hostname: monitortown
+  purpose: infratown
 tolerations:
 - key: "purpose"
   operator: "Equal"
-  value: "monitoring"
+  value: "infratown"
   effect: "NoSchedule"
-
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+replicas: 2
