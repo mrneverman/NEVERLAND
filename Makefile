@@ -16,9 +16,9 @@ Shine:
 	ansible-playbook -i inventory.cfg nevertown_init.yaml &&\
 	ansible-playbook -i inventory.cfg worktown_init.yaml &&\
 	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml &&\
-	ansible-playbook -i inventory.cfg cluster_settings.yaml &&\
-	ansible-playbook -i inventory.cfg istio_install.yaml &&\
+	ansible-playbook -i inventory.cfg cluster_settings.yaml &&\ 
 	ansible-playbook -i inventory.cfg prometheus_install.yaml &&\
+	ansible-playbook -i inventory.cfg istio_install.yaml &&\
 	ansible-playbook -i inventory.cfg sampleAcmeApp.yaml
 
 SinkAll:
@@ -41,6 +41,8 @@ PortofNeverland = $(shell grep ansible_host ./ansible/inventory.cfg|grep portOfN
 IslandOfIntelligence = $(shell grep ansible_host ./ansible/inventory.cfg|grep islandOfIntelligence  | sed 's/.*=//g')
 Nevertown = $(shell grep ansible_host ./ansible/inventory.cfg|grep Nevertown | sed 's/.*=//g')
 Worktown = $(shell grep ansible_host ./ansible/inventory.cfg|grep worktown-$(Nu) | sed 's/.*=//g')
+Infratown = $(shell grep ansible_host ./ansible/inventory.cfg|grep infratown-$(Nu) | sed 's/.*=//g')
+
 
 PortofNeverland:
 	ssh -o "StrictHostKeyChecking=no" -i sensitive_data/fisherman fisherman@$(PortofNeverland)
@@ -54,4 +56,8 @@ Nevertown:
 Worktown:
 	# set Nu. for worktown number. Ex: make Worktown Nu=1
 	ssh -o "StrictHostKeyChecking=no" -o ProxyCommand="ssh -o \"StrictHostKeyChecking=no\" -i sensitive_data/fisherman -W %h:%p fisherman@$(PortofNeverland)" -i sensitive_data/kubeman kubeman@$(Worktown)
+
+Infratown:
+	# set Nu. for infratown number. Ex: make Infratown Nu=1
+	ssh -o "StrictHostKeyChecking=no" -o ProxyCommand="ssh -o \"StrictHostKeyChecking=no\" -i sensitive_data/fisherman -W %h:%p fisherman@$(PortofNeverland)" -i sensitive_data/kubeman kubeman@$(Infratown)
 
