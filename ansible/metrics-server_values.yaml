@@ -1,11 +1,34 @@
-nodeSelector:
-  purpose: infratown
+replicas: 2
+
+podLabels:
+  app: metrics-server
+
 tolerations:
-- key: "purpose"
-  operator: "Equal"
-  value: "infratown"
+- key: "node-role.kubernetes.io/infra"
+  operator: "Exists"
   effect: "NoSchedule"
+
 podDisruptionBudget:
   enabled: true
   minAvailable: 1
-replicas: 2
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - topologyKey: node-role.kubernetes.io/infra
+      labelSelector:
+        matchLabels:
+          app: metrics-server
+      namespaces:
+      - monitoring
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/infra
+          operator: In
+          values:
+{% for i in range(infrastructure_nodes|length) %}
+          - "{{ i }}" 
+{% endfor %}
+

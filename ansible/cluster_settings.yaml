@@ -12,13 +12,15 @@
       delay: 1
       timeout: 300
 
-  - name: taint infrastructure town
-    command: kubectl taint node {{item}} purpose=infratown:NoSchedule
+  - name: taint infrastructure towns
+    command: kubectl taint node {{item}} node-role.kubernetes.io/infra:NoSchedule
     loop: "{{infrastructure_nodes}}"
 
-  - name: taint infrastructure town
-    command: kubectl label node {{item}} purpose=infratown
+  - name: label infrastructure towns
+    command: kubectl label node {{item}} node-role.kubernetes.io/infra="{{loop_index}}"
     loop: "{{infrastructure_nodes}}"
+    loop_control:
+      index_var: loop_index
 
   - name: install Pod network
     shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
@@ -35,7 +37,7 @@
     command: helm repo update
 
   - name: Copy metrics-server_values.yaml
-    copy:
+    template:
      src: metrics-server_values.yaml
      dest: /tmp
      mode: 0755
