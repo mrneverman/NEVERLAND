@@ -58,6 +58,11 @@ resource "local_file" "tf_k8node_vars_file_new" {
       - ${module.infratowns[name].ip}
     %{endfor~}
 
+    worker_nodes:
+    %{for name in var.worker_nodes_name~}
+      - "${name}"
+    %{endfor~}
+
     infrastructure_nodes:
     %{for name in var.infrastructure_nodes_name~}
       - "${name}"

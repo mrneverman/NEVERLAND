@@ -10,7 +10,9 @@ variable "worker_nodes_name" {
 variable "infrastructure_nodes_name" {
   type = list(any)
   default = ["infratown-1",
-  "infratown-2"]
+  "infratown-2",
+  "infratown-3",
+  "infratown-4"]
   description = "Name of infrastructure nodes that will host monitoring, istio daemon and related pods. "
 }
 
