@@ -29,6 +29,6 @@ affinity:
           operator: In
           values:
 {% for i in range(infrastructure_nodes|length) %}
-          - "{{ i }}" 
+          - "{{ i+1}}" 
 {% endfor %}
 

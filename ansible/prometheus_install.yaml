@@ -20,7 +20,7 @@
     command: helm repo update
 
   - name: Copy prometheus_values.yaml
-    copy:
+    template:
      src: prometheus_values.yaml
      dest: /tmp
      mode: 0755

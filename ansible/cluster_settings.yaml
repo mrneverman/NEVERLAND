@@ -17,8 +17,14 @@
     loop: "{{infrastructure_nodes}}"
 
   - name: label infrastructure towns
-    command: kubectl label node {{item}} node-role.kubernetes.io/infra="{{loop_index}}"
+    command: kubectl label node {{item}} node-role.kubernetes.io/infra="{{loop_index+1}}"
     loop: "{{infrastructure_nodes}}"
+    loop_control:
+      index_var: loop_index
+
+  - name: label worker towns
+    command: kubectl label node {{item}} node-role.kubernetes.io/worker="{{loop_index+1}}"
+    loop: "{{worker_nodes}}"
     loop_control:
       index_var: loop_index
 

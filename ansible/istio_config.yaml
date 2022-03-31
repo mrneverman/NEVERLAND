@@ -5,11 +5,30 @@ spec:
   components:
     pilot:
       k8s:
-        nodeSelector:
-          purpose: infratown
         tolerations:
-        - key: "purpose"
-          operator: "Equal"
-          value: "infratown"
+        - key: "node-role.kubernetes.io/infra"
+          operator: "Exists"
           effect: "NoSchedule"
+        replicaCount: 2
+        podDisruptionBudget:
+          minAvailable: 1
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: node-role.kubernetes.io/infra
+              labelSelector:
+                matchLabels:
+                  app: istiod
+              namespaces:
+              - istio-system
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/infra
+                  operator: In
+                  values:
+        {% for i in range(infrastructure_nodes|length) %}
+                  - "{{ i }}"
+        {% endfor %}
 

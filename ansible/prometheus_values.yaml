@@ -1,65 +1,86 @@
-prometheus:
-  prometheusSpec:
-    externalUrl: /prometheus/ 
 
 alertmanager:
   alertmanagerSpec:
     replicas: 2
-    nodeSelector:
-      purpose: infratown
     tolerations:
-    - key: "purpose"
-      operator: "Equal"
+    - key: "node-role.kubernetes.io/infra"
+      operator: "Exists"
       value: "infratown"
-      effect: "NoSchedule"
+    podAntiAffinityTopologyKey: node-role.kubernetes.io/infra
+    podAntiAffinity: "hard"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/infra
+              operator: In
+              values:
+{% for i in range(infrastructure_nodes|length) %}
+              - "{{ i+1 }}"
+{% endfor %}
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
 
+
 grafana:
   adminPassword: admin
-  nodeSelector:
-    purpose: infratown
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/infra
+            operator: In
+            values:
+{% for i in range(infrastructure_nodes|length) %}
+            - "{{ i+1 }}"
+{% endfor %}
   tolerations:
-  - key: "purpose"
-    operator: "Equal"
-    value: "infratown"
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
     effect: "NoSchedule"
+
 kube-state-metrics:
- nodeSelector:
-   purpose: infratown
- tolerations:
- - key: "purpose"
-   operator: "Equal"
-   value: "infratown"
-   effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/infra
+            operator: In
+            values:
+{% for i in range(infrastructure_nodes|length) %}
+            - "{{ i+1 }}"
+{% endfor %}
+  tolerations:
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
+    effect: "NoSchedule"
+
 prometheus:
   prometheusSpec:
+    externalUrl: /prometheus/
     replicas: 2
-    nodeSelector:
-      purpose: infratown
     tolerations:
-    - key: "purpose"
-      operator: "Equal"
-      value: "infratown"
+    - key: "node-role.kubernetes.io/infra"
+      operator: "Exists"
       effect: "NoSchedule"
+    podAntiAffinityTopologyKey: node-role.kubernetes.io/infra
+    podAntiAffinity: "hard"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/infra
+              operator: In
+              values:
+{% for i in range(infrastructure_nodes|length) %}
+              - "{{ i+1 }}"
+{% endfor %}
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
-prometheusOperator:
-  admissionWebhooks:
-    nodeSelector:
-      purpose: infratown
-    tolerations:
-    - key: "purpose"
-      operator: "Equal"
-      value: "infratown"
-      effect: "NoSchedule"
-  nodeSelector:
-    purpose: infratown
-  tolerations:
-  - key: "purpose"
-    operator: "Equal"
-    value: "infratown"
-    effect: "NoSchedule"
 

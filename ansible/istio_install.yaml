@@ -33,7 +33,7 @@
       state: link
   
   - name: Copy istio_config.yaml
-    copy:
+    template:
      src: istio_config.yaml
      dest: /tmp
      mode: 0755
@@ -81,21 +81,37 @@
 
   - name: Configure yaml for tolerations & nodeselector
     blockinfile:
-      path: "{{ item }}"
+      path: "{{ item.path }}"
       insertbefore: containers
       block: |2
-              nodeSelector:
-                purpose: infratown
               tolerations:
-              - key: "purpose"
-                operator: "Equal"
-                value: "infratown"
+              - key: "node-role.kubernetes.io/infra"
+                operator: "Exists"
                 effect: "NoSchedule"
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                  - topologyKey: node-role.kubernetes.io/infra
+                    labelSelector:
+                      matchLabels:
+                        app: "{{ item.appLabel }}"
+                    namespaces:
+                    - istio-system
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: node-role.kubernetes.io/infra
+                        operator: In
+                        values:
+              {% for i in range(infrastructure_nodes|length) %}
+                        - "{{ i+1 }}"
+              {% endfor %}
     with_items:
-    - /opt/istio-{{ istio_version }}/samples/addons/kiali.yaml
-    - /opt/istio-{{ istio_version }}/samples/addons/grafana.yaml
-    - /opt/istio-{{ istio_version }}/samples/addons/jaeger.yaml
-    - /opt/istio-{{ istio_version }}/samples/addons/prometheus.yaml
+    - {'appLabel': 'kiali', 'path': '/opt/istio-{{ istio_version }}/samples/addons/kiali.yaml'}
+    - {'appLabel': 'grafana', 'path': '/opt/istio-{{ istio_version }}/samples/addons/grafana.yaml'}
+    - {'appLabel': 'jaeger', 'path': '/opt/istio-{{ istio_version }}/samples/addons/jaeger.yaml'}
+    - {'appLabel': 'prometheus', 'path': '/opt/istio-{{ istio_version }}/samples/addons/prometheus.yaml'}
 
   - name: Install Kiali dashboard
     become_user: fisherman
