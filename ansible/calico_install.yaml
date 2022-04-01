@@ -1,0 +1,75 @@
+- name: Calico installation
+  hosts: portOfNeverland
+  become_user: fisherman
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+  vars:
+    calico_version: v3.22
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    wait_for_connection:
+      delay: 1
+      timeout: 300
+
+  - name: Download calico yaml
+    get_url:
+      url: https://projectcalico.docs.tigera.io/archive/{{ calico_version }}/manifests/calico.yaml
+      dest: /tmp
+      remote_src: yes
+
+
+  - name:  update nodeSelector and tolerations patch calico-kube-controllers deployment calico.yaml
+    replace:
+      path: /tmp/calico.yaml
+      regexp: '^kind:.Deployment.*\nmetadata:\n.*name: calico-kube-controllers[\s\S](\n|.)*?system-cluster-critical'
+      replace: |
+                kind: Deployment
+                metadata:
+                  name: calico-kube-controllers
+                  namespace: kube-system
+                  labels:
+                    k8s-app: calico-kube-controllers
+                spec:
+                  # The controllers can only have a single active instance.
+                  replicas: 1
+                  selector:
+                    matchLabels:
+                      k8s-app: calico-kube-controllers
+                  strategy:
+                    type: Recreate
+                  template:
+                    metadata:
+                      name: calico-kube-controllers
+                      namespace: kube-system
+                      labels:
+                        k8s-app: calico-kube-controllers
+                    spec:
+                      tolerations:
+                      - key: "node-role.kubernetes.io/infra"
+                        operator: "Exists"
+                        effect: "NoSchedule"
+                      affinity:
+                        nodeAffinity:
+                          requiredDuringSchedulingIgnoredDuringExecution:
+                            nodeSelectorTerms:
+                            - matchExpressions:
+                              - key: node-role.kubernetes.io/infra
+                                operator: In
+                                values:
+                {% for i in range(infrastructure_nodes|length) %}
+                                - "{{ i+1}}"
+                {% endfor %}
+                      serviceAccountName: calico-kube-controllers
+                      priorityClassName: system-cluster-critical
+
+  - name: install Pod network
+    shell: kubectl apply -f /tmp/calico.yaml
+
+  - name: Delete temporary files on remote
+    file:
+     path: /tmp/calico.yaml
+     state: absent
+
