@@ -42,11 +42,6 @@
     become_user: fisherman
     command: istioctl install -f /tmp/istio_config.yaml -y
 
-  - name: Delete istio_config.yaml
-    file:
-     path: /tmp/istio_config.yaml
-     state: absent
-
   - name: Copy istio yamls dir to remote
     copy:
      src: ../k8s/istio
@@ -121,10 +116,15 @@
     become_user: fisherman
     command: kubectl apply -f /tmp/istio/new_resources
 
-  - name: Delete istio yamls dir from remote
+  - name: Delete temporary files on remote
     file:
-     path: /tmp/istio
-     state: absent
+      path: "{{ item }}"
+      state: absent
+    with_items:
+    - /tmp/istio
+    - /tmp/neverland.com.crt
+    - /tmp/neverland.com.key
+    - /tmp/istio_config.yaml
   
   - name: Get kiali service account token
     become_user: fisherman
