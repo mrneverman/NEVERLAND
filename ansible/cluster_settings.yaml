@@ -12,6 +12,10 @@
       delay: 1
       timeout: 300
 
+  - name: approve pending certificate
+    shell:
+      cmd: kubectl get csr | grep Pending | grep kubelet-serving | awk '{print $1}' | xargs kubectl certificate approve
+
   - name: taint infrastructure towns
     command: kubectl taint node {{item}} node-role.kubernetes.io/infra:NoSchedule
     loop: "{{infrastructure_nodes}}"
@@ -28,35 +32,6 @@
     loop_control:
       index_var: loop_index
 
-  - name: install Pod network
-    shell: kubectl apply -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
-    args:
-      chdir: $HOME
-
   - name: create monitoring namespace
     command: kubectl create namespace monitoring
-
-  - name: helm repo add metrics-server
-    command: helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-
-  - name: helm repo update
-    command: helm repo update
-
-  - name: Copy metrics-server_values.yaml
-    template:
-     src: metrics-server_values.yaml
-     dest: /tmp
-     mode: 0755
-
-  - name: install metrics-server via helm
-    command: helm install --namespace monitoring metrics-server metrics-server/metrics-server -f /tmp/metrics-server_values.yaml
-
-  - name: Delete metrics-server_values.yaml
-    file:
-     path: /tmp/metrics-server_values.yaml
-     state: absent
-
-  - name: approve pending certificate
-    shell:
-      cmd: kubectl get csr | grep Pending | awk '{print $1}' | xargs kubectl certificate approve
 
