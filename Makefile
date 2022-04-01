@@ -17,7 +17,9 @@ Shine:
 	ansible-playbook -i inventory.cfg worktown_init.yaml &&\
 	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml &&\
 	ansible-playbook -i inventory.cfg cluster_settings.yaml &&\
+	ansible-playbook -i inventory.cfg calico_install.yaml &&\
 	ansible-playbook -i inventory.cfg istio_install.yaml &&\
+	ansible-playbook -i inventory.cfg metrics-server_install.yaml &&\
 	ansible-playbook -i inventory.cfg prometheus_install.yaml &&\
 	ansible-playbook -i inventory.cfg sampleAcmeApp.yaml
 
