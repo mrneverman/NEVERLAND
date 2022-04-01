@@ -117,7 +117,8 @@ class AuthUserBrowsing(UserBrowsing):
         response = self.client.post("/login/", json={"username": user, "password":"vmware1!"}, verify=False)
         if response.ok:
             body = response.json()
-            self.user.userid = body["token"]
+            logging.debug("ResponseBody" + str(body))
+            self.user.userid = body["access_token"]
     @task(2)
     def addToCart(self):
         """Randomly adds 1 or 2 of a random product to the cart"""
