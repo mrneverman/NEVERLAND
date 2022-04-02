@@ -1,0 +1,41 @@
+- name: goldilocks install
+  hosts: portOfNeverland
+  gather_facts: no
+  become_user: fisherman
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    wait_for_connection:
+      delay: 1
+      timeout: 300
+
+  - name: helm repo add goldilocks
+    command: helm repo add fairwinds-stable https://charts.fairwinds.com/stable
+
+  - name: helm repo update
+    command: helm repo update
+
+  - name: Copy goldilocks_values.yaml to remote
+    template:
+     src: goldilocks_values.yaml
+     dest: /tmp
+     mode: 0755
+
+  - name: Create goldilocks namespace
+    command: kubectl create ns goldilocks
+
+  - name: install goldilocks via helm
+    command: helm install goldilocks fairwinds-stable/goldilocks --namespace goldilocks -f /tmp/goldilocks_values.yaml
+
+  - name: Delete temporary files on remote
+    file:
+     path: /tmp/goldilocks_values.yaml
+     state: absent
+
+  - name: set kubectl port-forward on port of neverland
+    command: kubectl port-forward -n  goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80 --pod-running-timeout=2m
+

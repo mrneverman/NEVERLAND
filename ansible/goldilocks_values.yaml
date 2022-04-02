@@ -1,0 +1,83 @@
+vpa:
+# vpa.enabled -- If true, the vpa will be installed as a sub-chart
+  enabled: true
+  updater:
+    enabled: false
+  recommender:
+    podLabels:
+      app: goldilocks-vpa-recommender
+    tolerations:
+    - key: "node-role.kubernetes.io/infra"
+      operator: "Exists"
+      effect: "NoSchedule"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/infra
+              operator: In
+              values:
+{% for i in range(infrastructure_nodes|length) %}
+              - "{{i+1}}"
+{% endfor %}
+
+controller:
+  # controller.enabled -- Whether or not to install the controller deployment
+  enabled: true
+  deployment:
+    additionalLabels:
+      app: goldilocks-controller
+  tolerations:
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
+    effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/infra
+            operator: In
+            values:
+{% for i in range(infrastructure_nodes|length) %}
+            - "{{i+1}}"
+{% endfor %}
+  resources:
+    limits:
+      cpu: 25m
+      memory: 32Mi
+    requests:
+      cpu: 25m
+      memory: 32Mi
+
+dashboard:
+  # dashboard.enabled -- If true, the dashboard component will be installed
+  enabled: true
+  replicaCount: 2
+  deployment:
+    additionalLabels:
+      app: goldilocks-dashboard
+  resources:
+    limits:
+      cpu: 25m
+      memory: 32Mi
+    requests:
+      cpu: 25m
+      memory: 32Mi
+  tolerations:
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
+    effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/infra
+            operator: In
+            values:
+{% for i in range(infrastructure_nodes|length) %}
+            - "{{i+1}}"
+{% endfor %}
+
