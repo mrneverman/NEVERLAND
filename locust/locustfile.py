@@ -4,6 +4,7 @@ from time import sleep
 from locust import HttpUser, task, SequentialTaskSet, between
 import random
 import logging
+import json
 
 # List of users (pre-loaded into ACME Fitness shop)
 users = ["eric", "phoebe", "dwight", "han", "elaine", "walter"]
@@ -15,7 +16,7 @@ class UserBrowsing(SequentialTaskSet):
         self.client.verify = False
     def listCatalogItems(self):
         products = []
-        response = self.client.get("/products")
+        response = self.client.get("/products", verify=False)
         if response.ok:
             items = response.json()["data"]
             for item in items:
@@ -34,7 +35,7 @@ class UserBrowsing(SequentialTaskSet):
         details = self.getProductDetails(id)
         if details:
             for x in range(1, 4):
-                self.client.get(details["imageUrl"+str(x)])
+                self.client.get(details["imageUrl"+str(x)], verify=False)
     def getProductName(self, id):
         name = ""
         details = self.getProductDetails(id)
@@ -46,14 +47,14 @@ class UserBrowsing(SequentialTaskSet):
     @task
     def getProducts(self):
         logging.debug("User - Get Products")
-        self.client.get("/products")
+        self.client.get("/products", verify=False)
     @task(2)
     def getProduct(self):
         """Get details of a specific product"""
         logging.debug("User - Get a product")
         products = self.listCatalogItems()
         id = random.choice(products)
-        response = self.client.get("/products/"+ id)
+        response = self.client.get("/products/"+ id, verify=False)
         if response.ok:
             product = response.json()
             logging.debug("Product info - " +  str(product))
@@ -66,7 +67,7 @@ class UserBrowsing(SequentialTaskSet):
         self.getProductImages(id)
     @task(2)
     def index(self):
-        self.client.get("/")
+        self.client.get("/", verify=False)
 
 # AuthUserBrowsing simulates traffic for Authenticated Users (Logged in)
 class AuthUserBrowsing(UserBrowsing):
@@ -129,25 +130,30 @@ class AuthUserBrowsing(UserBrowsing):
             return
         logging.debug("Add to Cart for user " + self.user.userid)
         details = self.getProductDetails(productid)
-        cart = self.client.post("/cart/item/add/" + self.user.userid, verify=False, json={
+        cart = self.client.post("/cart/item/add/" + self.user.userid, json={
                   "name": details["name"],
                   "price": details["price"],
                   "shortDescription": "Test add to cart",
                   "quantity": random.randint(1,2),
                   "itemid": productid
-                })
+                }, verify=False)
     @task
     def removeFromCart(self):
         """Remove a random product from the cart. Helps prevent the cart from overflowing"""
         products = self.listCatalogItems()
         productid = random.choice(products)
         self.removeProductFromCart(self.user.userid, productid)
-    @task
+    @task(1)
     def checkout(self):
         if not self.user.userid:
             logging.warning("Not logged in, skipping 'Add to Checkout'")
             return
-        userCart = self.client.get("/cart/items/" + self.user.userid, verify=False).json()
+        userCartRaw= self.client.get("/cart/items/" + self.user.userid, verify=False)
+        logging.debug("Emre1: " + str(userCartRaw.text))
+        try:
+            userCart = userCartRaw.json()
+        except:
+            logging.debug("NonJson_userCart: " + str(userCartRaw.text))
         order = self.client.post("/order/add/"+ self.user.userid, json=self.Order_Info, verify=False)
 class UserBehavior(SequentialTaskSet):
     tasks = [AuthUserBrowsing, UserBrowsing]
