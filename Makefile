@@ -34,6 +34,22 @@ SinkAndRise: SinkAll Rise
 
 Reborn: SinkAll Rise Shine
 
+GoldilocksUp:
+	#Run Goldilocks Dashboard
+	cp terraform.additional/goldilocks_dashboard_firewall.tf terraform/ &&\
+	cd terraform &&\
+	terraform apply -auto-approve &&\
+	cd ../ansible &&\
+	ansible-playbook -i inventory.cfg goldilocks_install.yaml
+
+GoldilocksDown:
+	#Down Goldilocks Dashboard
+	rm terraform/goldilocks_dashboard_firewall.tf &&\
+	cd terraform &&\
+	terraform apply -auto-approve &&\
+	cd ../ansible &&\
+	ansible-playbook -i inventory.cfg goldilocks_uninstall.yaml
+
 ListIPs:
 	#List IPs of instances
 	grep ansible_host ./ansible/inventory.cfg
