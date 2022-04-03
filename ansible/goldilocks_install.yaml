@@ -36,6 +36,21 @@
      path: /tmp/goldilocks_values.yaml
      state: absent
 
-  - name: set kubectl port-forward on port of neverland
-    command: kubectl port-forward -n  goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80 --pod-running-timeout=2m
+  - name: Wait for goldilocks service end-point are available
+    command: kubectl -n goldilocks get ep goldilocks-dashboard -o jsonpath='{.subsets[0].ports[0].port}'
+    register: result
+    until:  result.stdout == "8080"
+    retries: 20
+    delay: 1
+
+  - name: Set kubectl port-forward on port of neverland
+    command: kubectl port-forward -n  goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80
+    register: result
+    until: result is success
+    async: 600
+    poll: 0
+
+  - name: Print dashboard adress
+    debug:
+     msg: "Goldilocks Dashboard URL:  {{ hostvars['portOfNeverland'].ansible_host }}:8080 "
 
