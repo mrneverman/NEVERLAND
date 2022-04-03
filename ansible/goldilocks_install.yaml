@@ -1,6 +1,7 @@
-- name: goldilocks install
+- name: Goldilocks install
   hosts: portOfNeverland
-  gather_facts: no
+  gather_facts: false
+  become: true
   become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
@@ -9,48 +10,55 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
   - name: helm repo add goldilocks
-    command: helm repo add fairwinds-stable https://charts.fairwinds.com/stable
+    ansible.builtin.command: helm repo add fairwinds-stable https://charts.fairwinds.com/stable
 
   - name: helm repo update
-    command: helm repo update
+    ansible.builtin.command: helm repo update
 
   - name: Copy goldilocks_values.yaml to remote
-    template:
-     src: goldilocks_values.yaml
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.template:
+      src: goldilocks_values.yaml
+      dest: /tmp
+      mode: 0644
 
   - name: Create goldilocks namespace
-    command: kubectl create ns goldilocks
+    ansible.builtin.command: kubectl create ns goldilocks
 
-  - name: install goldilocks via helm
-    command: helm install goldilocks fairwinds-stable/goldilocks --namespace goldilocks -f /tmp/goldilocks_values.yaml
+  - name: Install goldilocks via helm
+    ansible.builtin.command: helm install goldilocks fairwinds-stable/goldilocks --namespace goldilocks -f /tmp/goldilocks_values.yaml
 
   - name: Delete temporary files on remote
-    file:
-     path: /tmp/goldilocks_values.yaml
-     state: absent
+    ansible.builtin.file:
+      path: /tmp/goldilocks_values.yaml
+      state: absent
 
   - name: Wait for goldilocks service end-point are available
-    command: kubectl -n goldilocks get ep goldilocks-dashboard -o jsonpath='{.subsets[0].ports[0].port}'
+    ansible.builtin.command: kubectl -n goldilocks get ep goldilocks-dashboard -o jsonpath='{.subsets[0].ports[0].port}'
     register: result
-    until:  result.stdout == "8080"
+    until: result.stdout == "8080"
     retries: 20
     delay: 1
 
   - name: Set kubectl port-forward on port of neverland
-    command: kubectl port-forward -n  goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80
+    ansible.builtin.command: kubectl port-forward -n  goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80
     register: result
     until: result is success
     async: 600
     poll: 0
 
-  - name: Print dashboard adress
-    debug:
-     msg: "Goldilocks Dashboard URL:  {{ hostvars['portOfNeverland'].ansible_host }}:8080 "
+  - name: Check open ports
+    ansible.builtin.command: netstat -plnt
+    register: result
 
+  - name: Print open ports
+    ansible.builtin.debug:
+      msg: "{{ result.stdout_lines }}"
+      
+  - name: Print dashboard adress
+    ansible.builtin.debug:
+      msg: "Goldilocks Dashboard URL:  {{ hostvars['portOfNeverland'].ansible_host }}:8080 "

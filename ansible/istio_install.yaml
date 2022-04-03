@@ -1,7 +1,7 @@
 - name: istioctl installation
   hosts: portOfNeverland
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   become_method: sudo
   become_user: root
   vars_files:
@@ -13,69 +13,69 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
   - name: Download and Unarchive istio
-    unarchive:
+    ansible.builtin.unarchive:
       src: https://github.com/istio/istio/releases/download/{{ istio_version }}/istio-{{ istio_version }}-linux-amd64.tar.gz
       dest: /opt
-      remote_src: yes
+      remote_src: true
       owner: root
       group: root
       mode: 0755
 
   - name: Create sym link for istioctl
-    file:
+    ansible.builtin.file:
       src: /opt/istio-{{ istio_version }}/bin/istioctl
       dest: /usr/local/bin/istioctl
       state: link
-  
+
   - name: Copy istio_config.yaml
-    template:
-     src: istio_config.yaml
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.template:
+      src: istio_config.yaml
+      dest: /tmp
+      mode: 0755
 
   - name: Install istio
     become_user: fisherman
-    command: istioctl install -f /tmp/istio_config.yaml -y
+    ansible.builtin.command: istioctl install -f /tmp/istio_config.yaml -y
 
   - name: Copy istio yamls dir to remote
-    copy:
-     src: ../k8s/istio
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.copy:
+      src: ../k8s/istio
+      dest: /tmp
+      mode: 0755
 
   - name: Copy key to remote
-    copy:
-     src: ../sensitive_data/neverland.com.key
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.copy:
+      src: ../sensitive_data/neverland.com.key
+      dest: /tmp
+      mode: 0755
 
   - name: Copy certificate to remote
-    copy:
-     src: ../sensitive_data/neverland.com.crt
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.copy:
+      src: ../sensitive_data/neverland.com.crt
+      dest: /tmp
+      mode: 0755
 
   - name: Create secret for gateway TLS
     become_user: fisherman
-    command: kubectl create -n istio-system secret tls neverland-credential --key=/tmp/neverland.com.key --cert=/tmp/neverland.com.crt
+    ansible.builtin.command: kubectl create -n istio-system secret tls neverland-credential --key=/tmp/neverland.com.key --cert=/tmp/neverland.com.crt
 
   - name: Apply istio-system/istio-ingressgateway svc patch file
     become_user: fisherman
-    command: kubectl -n istio-system patch svc istio-ingressgateway --patch-file /tmp/istio/patch/istio-ingressgateway_patch.yaml
+    ansible.builtin.command: kubectl -n istio-system patch svc istio-ingressgateway --patch-file /tmp/istio/patch/istio-ingressgateway_patch.yaml
 
-  - name: Change auth method of kiali as token based  
-    replace:
+  - name: Change auth method of kiali as token based
+    ansible.builtin.replace:
       path: /opt/istio-{{ istio_version }}/samples/addons/kiali.yaml
       regexp: 'anonymous'
       replace: token
 
   - name: Configure yaml for tolerations & nodeselector
-    blockinfile:
+    ansible.builtin.blockinfile:
       path: "{{ item.path }}"
       insertbefore: containers
       block: |2
@@ -110,14 +110,14 @@
 
   - name: Install Kiali dashboard
     become_user: fisherman
-    command: kubectl apply -f /opt/istio-{{ istio_version }}/samples/addons
+    ansible.builtin.command: kubectl apply -f /opt/istio-{{ istio_version }}/samples/addons
 
   - name: Apply new k8s resources
     become_user: fisherman
-    command: kubectl apply -f /tmp/istio/new_resources
+    ansible.builtin.command: kubectl apply -f /tmp/istio/new_resources
 
   - name: Delete temporary files on remote
-    file:
+    ansible.builtin.file:
       path: "{{ item }}"
       state: absent
     with_items:
@@ -125,12 +125,15 @@
     - /tmp/neverland.com.crt
     - /tmp/neverland.com.key
     - /tmp/istio_config.yaml
-  
+
   - name: Get kiali service account token
     become_user: fisherman
-    shell:  kubectl -n istio-system get secrets $(kubectl -n istio-system get sa kiali -ojsonpath='{.secrets[0].name}') -ojsonpath='{.data.token}'|base64 -d
+    ansible.builtin.shell: kubectl -n istio-system get secrets $(kubectl -n istio-system get sa kiali -ojsonpath='{.secrets[0].name}') -ojsonpath='{.data.token}'|base64 -d
     register: kiali_sa_token
 
   - name: Copy kiali service account token to local file
-    local_action: copy content="{{ kiali_sa_token.stdout_lines[0] }}" dest="../sensitive_data/kiali_sa_token" mode=0777
-
+    ansible.builtin.copy:
+      content: "{{ kiali_sa_token.stdout_lines[0] }}"
+      dest: "../sensitive_data/kiali_sa_token"
+      mode: 0600
+    delegate_to: localhost

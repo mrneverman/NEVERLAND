@@ -1,84 +1,84 @@
-- name: Port of Neverland initialization  
+- name: Port of Neverland initialization
   hosts: portOfNeverland
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   become_method: sudo
   become_user: root
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
   - ./terraform_variables/tf_network_vars_file.yml
   - ./variables.yaml
- 
+
   vars:
-    username: fisherman  
+    username: fisherman
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
-  - name: update cache ~ apt-get update
-    apt:
+  - name: Update cache ~ apt-get update
+    ansible.builtin.apt:
       update_cache: true
 
   - name: Add the Google Cloud public signing key
-    apt_key:
+    ansible.builtin.apt_key:
       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
       state: present
 
   - name: Create kubernetes repo file
-    apt_repository:
-      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main 
+    ansible.builtin.apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
       filename: kubernetes
       mode: 0600
 
-  - name: install kubectl
-    apt:
+  - name: Install kubectl
+    ansible.builtin.apt:
       name:
       - kubectl={{ K8s_version_ }}
       state: present
 
   - name: Add helm public signing key
-    apt_key:
+    ansible.builtin.apt_key:
       url: https://baltocdn.com/helm/signing.asc
       state: present
 
-  - name: install apt-transport-https
-    apt:
+  - name: Install apt-transport-https
+    ansible.builtin.apt:
       name:
       - apt-transport-https
       state: present
 
   - name: Create helm repo file
-    apt_repository:
+    ansible.builtin.apt_repository:
       repo: deb https://baltocdn.com/helm/stable/debian/ all main
       state: present
       filename: helm
       mode: 0600
 
-  - name: install helm
-    apt:
+  - name: Install helm
+    ansible.builtin.apt:
       name:
       - helm
       state: present
       update_cache: true
 
-  - name: install Bat. A cat clone with wings
-    apt:
+  - name: Install Bat. A cat clone with wings
+    ansible.builtin.apt:
       deb: https://github.com/sharkdp/bat/releases/download/v0.20.0/bat-musl_0.20.0_amd64.deb
 
   - name: Create directory for kube config.
-    file: 
+    ansible.builtin.file:
       path: /home/{{ username }}/.kube
       state: directory
       owner: "{{ username }}"
       group: "{{ username }}"
       mode: 0700
 
-  - name: copy kube config file
-    copy:
+  - name: Copy kube config file
+    ansible.builtin.copy:
       src: ./ClusterInitFiles/admin.conf
       dest: /home/{{ username }}/.kube/config
       owner: "{{ username }}"
@@ -86,7 +86,7 @@
       mode: '0700'
 
   - name: Configure kubectl command auto-completion and aliases.
-    blockinfile:
+    ansible.builtin.blockinfile:
       path: /home/{{ username }}/.bashrc
       insertafter: EOF
       block: |
@@ -99,10 +99,10 @@
         alias batnoyl='bat -l yaml --style plain'
 
   - name: Configure .vimrc.
-    blockinfile:
+    ansible.builtin.blockinfile:
       path: /home/{{ username }}/.vimrc
       insertafter: EOF
-      create: yes
+      create: true
       marker: "\" {mark} ANSIBLE MANAGED BLOCK"
       owner: "{{ username }}"
       group: "{{ username }}"

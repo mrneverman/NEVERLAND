@@ -1,6 +1,7 @@
-- name: goldilocks uninstall
+- name: Goldilocks uninstall
   hosts: portOfNeverland
-  gather_facts: no
+  gather_facts: false
+  become: true
   become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
@@ -9,24 +10,24 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
   - name: Uninstall goldilocks via helm
-    command: helm uninstall goldilocks --namespace goldilocks
+    ansible.builtin.command: helm uninstall goldilocks --namespace goldilocks
 
   - name: Delete goldilocks namespace
-    command: kubectl delete ns goldilocks --force 
+    ansible.builtin.command: kubectl delete ns goldilocks --force
 
   - name: Kill kubectl port-forward for goldilocks
-    shell: ps -fe|grep "kubectl port-forward -n goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80" | grep -v grep | awk '{print $2}' | xargs kill -s 9
-    ignore_errors: yes
+    ansible.builtin.shell: ps -fe|grep "kubectl port-forward -n goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80" | grep -v grep | awk '{print $2}' | xargs kill -s 9
+    ignore_errors: true
 
-  - name: Check open ports 
-    command: netstat -plnt
+  - name: Check open ports
+    ansible.builtin.command: netstat -plnt
     register: result
 
   - name: Print open ports
-    debug:
+    ansible.builtin.debug:
       msg: "{{ result.stdout_lines }}"

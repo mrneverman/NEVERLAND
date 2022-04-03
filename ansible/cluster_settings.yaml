@@ -1,5 +1,7 @@
 - name: Cluster Settings
   hosts: portOfNeverland
+  gather_facts: false
+  become: true
   become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
@@ -8,30 +10,29 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
-  - name: approve pending certificate
-    shell:
+  - name: Approve pending certificate
+    ansible.builtin.shell:
       cmd: kubectl get csr | grep Pending | grep kubelet-serving | awk '{print $1}' | xargs kubectl certificate approve
 
-  - name: taint infrastructure towns
-    command: kubectl taint node {{item}} node-role.kubernetes.io/infra:NoSchedule
-    loop: "{{infrastructure_nodes}}"
+  - name: Taint infrastructure towns
+    ansible.builtin.command: kubectl taint node {{ item }} node-role.kubernetes.io/infra:NoSchedule
+    loop: "{{ infrastructure_nodes }}"
 
-  - name: label infrastructure towns
-    command: kubectl label node {{item}} node-role.kubernetes.io/infra="{{loop_index+1}}"
-    loop: "{{infrastructure_nodes}}"
+  - name: Label infrastructure towns
+    ansible.builtin.command: kubectl label node {{ item }} node-role.kubernetes.io/infra="{{ loop_index+1 }}"
+    loop: "{{ infrastructure_nodes }}"
     loop_control:
       index_var: loop_index
 
-  - name: label worker towns
-    command: kubectl label node {{item}} node-role.kubernetes.io/worker="{{loop_index+1}}"
-    loop: "{{worker_nodes}}"
+  - name: Label worker towns
+    ansible.builtin.command: kubectl label node {{ item }} node-role.kubernetes.io/worker="{{ loop_index+1 }}"
+    loop: "{{ worker_nodes }}"
     loop_control:
       index_var: loop_index
 
-  - name: create monitoring namespace
-    command: kubectl create namespace monitoring
-
+  - name: Create monitoring namespace
+    ansible.builtin.command: kubectl create namespace monitoring

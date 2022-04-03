@@ -1,5 +1,7 @@
-- name: Cluster Settings
+- name: Install metrics-server
   hosts: portOfNeverland
+  gather_facts: false
+  become: true
   become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
@@ -8,27 +10,26 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
   - name: helm repo add metrics-server
-    command: helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+    ansible.builtin.command: helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 
   - name: helm repo update
-    command: helm repo update
+    ansible.builtin.command: helm repo update
 
   - name: Copy metrics-server_values.yaml
-    template:
-     src: metrics-server_values.yaml
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.template:
+      src: metrics-server_values.yaml
+      dest: /tmp
+      mode: 0700
 
-  - name: install metrics-server via helm
-    command: helm install --namespace monitoring metrics-server metrics-server/metrics-server -f /tmp/metrics-server_values.yaml
+  - name: Install metrics-server via helm
+    ansible.builtin.command: helm install --namespace monitoring metrics-server metrics-server/metrics-server -f /tmp/metrics-server_values.yaml
 
   - name: Delete temporary files on remote
-    file:
-     path: /tmp/metrics-server_values.yaml
-     state: absent
-
+    ansible.builtin.file:
+      path: /tmp/metrics-server_values.yaml
+      state: absent

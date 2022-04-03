@@ -1,8 +1,4 @@
 ---
-# vars file for InstallK8s
 install_kubelet: false
 install_kubeadm: false
 install_kubectl: false
-#K8s_version: 1.23.3-00
-#K8s_version: {{ K8s_version_ }}
-

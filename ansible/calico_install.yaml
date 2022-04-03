@@ -1,5 +1,7 @@
 - name: Calico installation
   hosts: portOfNeverland
+  gather_facts: false
+  become: true
   become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
@@ -10,19 +12,18 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
   - name: Download calico yaml
-    get_url:
+    ansible.builtin.get_url:
       url: https://projectcalico.docs.tigera.io/archive/{{ calico_version }}/manifests/calico.yaml
       dest: /tmp
-      remote_src: yes
+      mode: 0644
 
-
-  - name:  update nodeSelector and tolerations patch calico-kube-controllers deployment calico.yaml
-    replace:
+  - name: Update nodeSelector and tolerations patch calico-kube-controllers deployment calico.yaml
+    ansible.builtin.replace:
       path: /tmp/calico.yaml
       regexp: '^kind:.Deployment.*\nmetadata:\n.*name: calico-kube-controllers[\s\S](\n|.)*?system-cluster-critical'
       replace: |
@@ -60,16 +61,15 @@
                                 operator: In
                                 values:
                 {% for i in range(infrastructure_nodes|length) %}
-                                - "{{ i+1}}"
+                                - "{{ i+1 }}"
                 {% endfor %}
                       serviceAccountName: calico-kube-controllers
                       priorityClassName: system-cluster-critical
 
-  - name: install Pod network
-    shell: kubectl apply -f /tmp/calico.yaml
+  - name: Install Pod network
+    ansible.builtin.command: kubectl apply -f /tmp/calico.yaml
 
   - name: Delete temporary files on remote
-    file:
-     path: /tmp/calico.yaml
-     state: absent
-
+    ansible.builtin.file:
+      path: /tmp/calico.yaml
+      state: absent

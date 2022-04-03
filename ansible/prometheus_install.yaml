@@ -1,4 +1,7 @@
 - name: Deploy prometheus and grafana stack
+  become_user: fisherman
+  become: true
+  gather_facts: false
   hosts: portOfNeverland
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
@@ -7,36 +10,32 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
-  - name: helm repo add prometheus-community 
-    become_user: fisherman
-    command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  - name: helm repo add prometheus-community
+    ansible.builtin.command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
   - name: helm repo update
-    become_user: fisherman
-    command: helm repo update
+    ansible.builtin.command: helm repo update
 
   - name: Copy prometheus_values.yaml
-    template:
-     src: prometheus_values.yaml
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.template:
+      src: prometheus_values.yaml
+      dest: /tmp
+      mode: 0755
 
-  - name: install prometheus via helm
-    become_user: fisherman
-    command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack -f /tmp/prometheus_values.yaml
+  - name: Install prometheus via helm
+    ansible.builtin.command: helm install k8spromethuesstack --namespace monitoring prometheus-community/kube-prometheus-stack -f /tmp/prometheus_values.yaml
 
-  - name:  Delete temporary files on remote
-    file:
-     path: /tmp/prometheus_values.yaml
-     state: absent
+  - name: Delete temporary files on remote
+    ansible.builtin.file:
+      path: /tmp/prometheus_values.yaml
+      state: absent
 
-  - name: patch grafana deployment
-    become_user: fisherman
-    shell:
+  - name: Patch grafana deployment
+    ansible.builtin.shell:
       cmd: |
             kubectl -n monitoring patch deployments.apps k8spromethuesstack-grafana --patch-file=/dev/stdin <<-EOF
                             spec:
@@ -53,9 +52,8 @@
                                     name: grafana
             EOF
 
-  - name: deploy grafana&prometheus virtual service
-    become_user: fisherman
-    shell:
+  - name: Deploy grafana&prometheus virtual service
+    ansible.builtin.shell:
       cmd: |
            cat <<EOF | kubectl apply -f -
                       apiVersion: networking.istio.io/v1alpha3
@@ -91,4 +89,3 @@
                               port:
                                 number: 80
                  EOF
-

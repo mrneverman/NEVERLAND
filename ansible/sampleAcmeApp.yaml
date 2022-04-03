@@ -1,6 +1,9 @@
 # Based on https://github.com/vmwarecloudadvocacy/acme_fitness_demo
 - name: Deploy sample Acme App
   hosts: portOfNeverland
+  gather_facts: false
+  become: true
+  become_user: fisherman
   vars_files:
   - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
   - ./terraform_variables/tf_network_vars_file.yml
@@ -8,21 +11,18 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
-  - name: create sampleapp namespace 
-    become_user: fisherman
-    command: kubectl create namespace sampleapp
- 
-  - name: label sampleapp namespace for istio side-car injection
-    become_user: fisherman
-    command: kubectl label namespace sampleapp istio-injection=enabled
+  - name: Create sampleapp namespace
+    ansible.builtin.command: kubectl create namespace sampleapp
 
-  - name: create secrets
-    become_user: fisherman
-    shell:
+  - name: Label sampleapp namespace for istio side-car injection
+    ansible.builtin.command: kubectl label namespace sampleapp istio-injection=enabled
+
+  - name: Create secrets
+    ansible.builtin.shell:
       cmd: |
             kubectl -n sampleapp create secret generic cart-redis-pass --from-literal=password=pass
             kubectl -n sampleapp create secret generic catalog-mongo-pass --from-literal=password=pass
@@ -31,23 +31,21 @@
             kubectl -n sampleapp create secret generic users-redis-pass --from-literal=password=pass
 
   - name: Copy sample app  yamls dir to remote
-    copy:
-     src: ../k8s/sampleAcmeApp
-     dest: /tmp
-     mode: 0755
+    ansible.builtin.copy:
+      src: ../k8s/sampleAcmeApp
+      dest: /tmp
+      mode: 0700
 
   - name: Apply new k8s resources
-    become_user: fisherman
-    command: kubectl -n sampleapp apply -f /tmp/sampleAcmeApp/
+    ansible.builtin.command: kubectl -n sampleapp apply -f /tmp/sampleAcmeApp/
 
   - name: Delete sample app yamls dir from remote
-    file:
-     path: /tmp/sampleAcmeApp/
-     state: absent
+    ansible.builtin.file:
+      path: /tmp/sampleAcmeApp/
+      state: absent
 
-  - name: create hpa
-    become_user: fisherman
-    shell:
+  - name: Create hpa
+    ansible.builtin.shell:
       cmd: |
             kubectl -n sampleapp autoscale deployment cart --max=10 --min=1 --cpu-percent=80
             kubectl -n sampleapp autoscale deployment cart-redis --max=10 --min=1 --cpu-percent=80
@@ -62,9 +60,8 @@
             kubectl -n sampleapp autoscale deployment users-mongo --max=10 --min=1 --cpu-percent=80
             kubectl -n sampleapp autoscale deployment users-redis --max=10 --min=1 --cpu-percent=80
 
-  - name: deploy sampleapp virtual service
-    become_user: fisherman
-    shell:
+  - name: Deploy sampleapp virtual service
+    ansible.builtin.shell:
       cmd: |
            cat <<EOF | kubectl apply -f -
                       apiVersion: networking.istio.io/v1alpha3
@@ -89,4 +86,3 @@
                               port:
                                 number: 80
                  EOF
-

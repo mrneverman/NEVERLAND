@@ -1,7 +1,7 @@
-- name: worktown initialization  
+- name: worktown initialization
   hosts: Worktowns
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   become_method: sudo
   become_user: root
   vars_files:
@@ -11,12 +11,12 @@
 
   tasks:
   - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
-    wait_for_connection:
+    ansible.builtin.wait_for_connection:
       delay: 1
       timeout: 300
 
-  - name: install containerd and K8s with kubeadm
-    include_role:
+  - name: Install containerd and K8s with kubeadm
+    ansible.builtin.include_role:
       name: InstallK8s
     vars:
       install_kubelet: true
