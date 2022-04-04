@@ -44,11 +44,14 @@
     retries: 20
     delay: 1
 
+  - name: Label target namespace
+    ansible.builtin.command: kubectl label namespace {{ Namespace }}  goldilocks.fairwinds.com/enabled=true
+
   - name: Set kubectl port-forward on port of neverland
     ansible.builtin.command: kubectl port-forward -n  goldilocks service/goldilocks-dashboard --address=0.0.0.0 8080:80
     register: result
     until: result is success
-    async: 600
+    async: 6000
     poll: 0
 
   - name: Check open ports
