@@ -42,8 +42,11 @@ spec:
         name: frontend
         resources:
             requests:
-              cpu: "100m"
-              memory: "250Mi"
+              cpu: "165m"
+              memory: "164M"
+            limit:
+              cpu: "165m"
+              memory: "164M"
         env:
         - name: FRONTEND_PORT
           value: '3000'

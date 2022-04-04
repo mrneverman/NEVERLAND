@@ -77,8 +77,8 @@ spec:
           name: "acmefit-users-data"
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "100m"
+            memory: "55M"
+            cpu: "65m"
           limits:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "55M"
+            cpu: "65m"

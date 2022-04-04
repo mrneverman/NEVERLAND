@@ -44,11 +44,11 @@ spec:
         name: cart
         resources:
           requests:
-            cpu: "100m"
-            memory: "100Mi"
+            cpu: "225m"
+            memory: "80M"
           limits:
-            cpu: "200m"
-            memory: "200Mi"
+            cpu: "225m"
+            memory: "80M"
         env:
         - name: REDIS_HOST
           value: 'cart-redis.sampleapp.svc.cluster.local'
@@ -77,10 +77,3 @@ spec:
         volumeMounts:
         - mountPath: "/data"
           name: "acmefit-cart-data"
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"

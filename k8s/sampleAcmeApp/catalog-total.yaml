@@ -74,8 +74,8 @@ spec:
           name: "acmefit-catalog-data"
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "100m"
+            memory: "64M"
+            cpu: "65m"
           limits:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "64M"
+            cpu: "65m"

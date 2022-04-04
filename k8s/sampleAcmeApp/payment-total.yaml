@@ -40,11 +40,11 @@ spec:
         name: payment
         resources:
           requests:
-            cpu: "100m"
-            memory: "100Mi"
+            cpu: "65m"
+            memory: "80M"
           limits:
-            cpu: "200m"
-            memory: "200Mi"
+            cpu: "65m"
+            memory: "79M"
         env:
         - name: PAYMENT_PORT
           value: '9000'

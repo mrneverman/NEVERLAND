@@ -42,11 +42,11 @@ spec:
         name: pos
         resources:
           requests:
-            cpu: "100m"
-            memory: "100Mi"
+            cpu: "15m"
+            memory: "55M"
           limits:
-            cpu: "200m"
-            memory: "200Mi"
+            cpu: "15m"
+            memory: "55M"
         env:
         - name: HTTP_PORT
           value: '7777'
