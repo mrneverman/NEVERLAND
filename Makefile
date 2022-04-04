@@ -85,6 +85,6 @@ Worktown:
 	ssh -o "StrictHostKeyChecking=no" -o ProxyCommand="ssh -o \"StrictHostKeyChecking=no\" -i sensitive_data/fisherman -W %h:%p fisherman@$(PortofNeverland)" -i sensitive_data/kubeman kubeman@$(Worktown)
 
 Infratown:
-        test -n "$(Nu)" || (echo "set Nu. for worktown number. Ex: make Worktown Nu=1" ; exit 1) &&\
+	test -n "$(Nu)" || (echo "set Nu. for infratown number. Ex: make Infratown Nu=1" ; exit 1) &&\
 	ssh -o "StrictHostKeyChecking=no" -o ProxyCommand="ssh -o \"StrictHostKeyChecking=no\" -i sensitive_data/fisherman -W %h:%p fisherman@$(PortofNeverland)" -i sensitive_data/kubeman kubeman@$(Infratown)
 
