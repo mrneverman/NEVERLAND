@@ -6,7 +6,7 @@ Rise:
 Knock:
 	# ansible ping all instance in NEVERLAND
 	rm ../.ssh/known_hosts ;\
-	@cd ansible &&\
+	cd ansible &&\
 	ansible all -i inventory.cfg -m ping
 
 Shine:
