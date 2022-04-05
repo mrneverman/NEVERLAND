@@ -20,7 +20,7 @@
   - name: Delete goldilocks namespace
     ansible.builtin.command: kubectl delete ns goldilocks --force
 
-  - name: Label target namespace
+  - name: Unlabel target namespace
     ansible.builtin.command: kubectl label namespace {{ Namespace }}  goldilocks.fairwinds.com/enabled-
 
   - name: Kill kubectl port-forward for goldilocks
