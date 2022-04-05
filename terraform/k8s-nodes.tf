@@ -19,7 +19,7 @@ module "infratowns" {
   source          = "./modules/gci"
   instance_name   = each.key
   ssh_user        = "kubeman"
-  tags            = ["k8s-worker", "internal", "infratown"]
+  tags            = ["k8s-infra", "internal"]
   subnetwork_name = google_compute_subnetwork.neverland-gcn-subnetwork.id
   for_each        = toset(var.infrastructure_nodes_name)
 }

@@ -109,7 +109,7 @@ resource "google_compute_firewall" "allow-reverse-proxy-to-istio-ingressgateway"
     ports    = [var.istioingressgateway_port]
   }
 
-  target_tags = ["internal"]
+  target_tags = ["k8s-worker"]
   source_tags = ["proxy"]
 }
 
