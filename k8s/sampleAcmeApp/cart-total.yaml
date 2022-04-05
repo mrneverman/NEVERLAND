@@ -27,7 +27,7 @@ spec:
       app: acmefit
       service: cart
   strategy:
-    type: Recreate
+    type: RollingUpdate
   replicas: 1
   template:
     metadata:
@@ -44,11 +44,11 @@ spec:
         name: cart
         resources:
           requests:
-            cpu: "225m"
-            memory: "80M"
+            cpu: "350m"
+            memory: "250M"
           limits:
-            cpu: "225m"
-            memory: "80M"
+            cpu: "350m"
+            memory: "250M"
         env:
         - name: REDIS_HOST
           value: 'cart-redis.sampleapp.svc.cluster.local'

@@ -39,10 +39,10 @@ spec:
           resources:
             requests:
               cpu: "15m"
-              memory: "100M"
+              memory: "110M"
             limits:
               cpu: "15m"
-              memory: "100M"
+              memory: "110M"
           ports:
             - name: users-mongo
               containerPort: 27017

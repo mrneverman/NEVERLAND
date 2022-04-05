@@ -38,11 +38,11 @@ spec:
           image: mongo:4
           resources:
             requests:
-              cpu: "35m"
-              memory: "100M"
+              cpu: "30m"
+              memory: "120M"
             limits:
-              cpu: "35m"
-              memory: "100M"
+              cpu: "30m"
+              memory: "120M"
           ports:
             - name: catalog-mongo
               containerPort: 27017

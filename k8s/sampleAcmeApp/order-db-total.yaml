@@ -44,11 +44,11 @@ spec:
         imagePullPolicy: "Always"
         resources:
           requests:
-            cpu: "65m"
-            memory: "145M"
+            cpu: "15m"
+            memory: "80M"
           limits:
-            cpu: "63m"
-            memory: "145M"
+            cpu: "15m"
+            memory: "80M"
         ports:
         - containerPort: 5432
           name: order-postgres

@@ -27,7 +27,7 @@ spec:
       app: acmefit
       service: payment
   strategy:
-    type: Recreate
+    type: RollingUpdate
   replicas: 1
   template:
     metadata:
@@ -40,11 +40,11 @@ spec:
         name: payment
         resources:
           requests:
-            cpu: "65m"
-            memory: "80M"
+            cpu: "25m"
+            memory: "100M"
           limits:
-            cpu: "65m"
-            memory: "79M"
+            cpu: "25m"
+            memory: "100M"
         env:
         - name: PAYMENT_PORT
           value: '9000'

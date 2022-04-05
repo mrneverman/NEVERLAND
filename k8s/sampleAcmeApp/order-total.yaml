@@ -27,7 +27,7 @@ spec:
       app: acmefit
       service: order
   strategy:
-    type: Recreate
+    type: RollingUpdate
   replicas: 1
   template:
     metadata:
@@ -86,7 +86,7 @@ spec:
         resources:
           requests:
             memory: "110M"
-            cpu: "205m"
+            cpu: "125m"
           limits:
             memory: "110M"
-            cpu: "205m"
+            cpu: "125m"

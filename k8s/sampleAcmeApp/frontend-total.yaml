@@ -29,7 +29,7 @@ spec:
       app: acmefit
       service: frontend
   strategy:
-    type: Recreate
+    type: RollingUpdate
   replicas: 1
   template:
     metadata:
@@ -42,10 +42,10 @@ spec:
         name: frontend
         resources:
             requests:
-              cpu: "165m"
+              cpu: "330m"
               memory: "164M"
-            limit:
-              cpu: "165m"
+            limits:
+              cpu: "330m"
               memory: "164M"
         env:
         - name: FRONTEND_PORT

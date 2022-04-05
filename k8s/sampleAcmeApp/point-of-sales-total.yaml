@@ -29,7 +29,7 @@ spec:
       app: acmefit
       service: pos
   strategy:
-    type: Recreate
+    type: RollingUpdate
   replicas: 1
   template:
     metadata:

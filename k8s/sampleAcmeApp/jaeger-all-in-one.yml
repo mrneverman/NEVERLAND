@@ -31,7 +31,7 @@ items:
         app.kubernetes.io/component: all-in-one
     replicas: 1
     strategy:
-      type: Recreate
+      type: RollingUpdate
     template:
       metadata:
         labels:
