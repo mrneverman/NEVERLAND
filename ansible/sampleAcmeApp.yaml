@@ -47,18 +47,18 @@
   - name: Create hpa
     ansible.builtin.shell:
       cmd: |
-            kubectl -n sampleapp autoscale deployment cart --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment cart-redis --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment catalog --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment catalog-mongo --max=20 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment cart --max=5 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment cart-redis --max=3 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment catalog --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment catalog-mongo --max=3 --min=1 --cpu-percent=80
             kubectl -n sampleapp autoscale deployment frontend --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment order --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment order-postgres --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment payment --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment pos --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment users --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment users-mongo --max=20 --min=1 --cpu-percent=80
-            kubectl -n sampleapp autoscale deployment users-redis --max=20 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment order --max=10 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment order-postgres --max=3 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment payment --max=3 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment pos --max=3 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment users --max=3 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment users-mongo --max=3 --min=1 --cpu-percent=80
+            kubectl -n sampleapp autoscale deployment users-redis --max=3 --min=1 --cpu-percent=80
 
   - name: Deploy sampleapp virtual service
     ansible.builtin.shell:
