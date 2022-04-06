@@ -56,6 +56,7 @@ LocustDashboardIP = $(shell curl -s https://ipecho.net/plain)
 LocustUp:
 	#Run Locust Dashboard
 	cd locust &&\
+	sed -i 's/.*neverland.com/$(IslandOfIntelligence) neverland.com/' /etc/hosts &&\
 	echo "Locust dashboard IP=       $(LocustDashboardIP):8089" &&\
 	rm locust.out.log locust.std.err 2> /dev/null || true ;\
 	locust --host=https://neverland.com --web-host=0.0.0.0 --web-port=8089 --loglevel=DEBUG --logfile=locust.out.log 2> locust.std.err
