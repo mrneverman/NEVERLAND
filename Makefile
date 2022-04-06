@@ -26,7 +26,8 @@ Shine:
 SinkAll:
 	#Sink All: Destroy all gcloud instances
 	cd terraform &&\
-	terraform destroy -auto-approve
+	terraform destroy -auto-approve &&\
+	rm goldilocks_dashboard_firewall.tf
 
 RiseAndShine: Rise Shine
 
