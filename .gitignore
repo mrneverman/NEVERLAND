@@ -10,3 +10,7 @@ notes.txt
 ansible/ClusterInitFiles/
 #ansible inventory
 ansible/inventory.cfg
+#locust output logs
+locust/locust.out.log
+locust/locust.std.err
+locust/__pycache__/
