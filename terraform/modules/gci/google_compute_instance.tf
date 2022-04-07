@@ -5,7 +5,7 @@ resource "google_compute_instance" "gci" {
   boot_disk {
     initialize_params {
       image = "ubuntu-os-cloud/ubuntu-1804-lts"
-      size  = 50
+      size  = 20
       type  = "pd-ssd"
     }
   }

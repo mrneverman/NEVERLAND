@@ -159,26 +159,74 @@
          https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port }}/
        when: install_kubectl
 
+     - name: Create /etc/kubernetes/manifests
+       ansible.builtin.file:
+         path: /etc/kubernetes/manifests
+         state: directory
+         mode: 0755
+
+     - name: Pull ghcr.io/kube-vip/kube-vip image
+       ansible.builtin.command: ctr images pull ghcr.io/kube-vip/kube-vip:$KVVERSION
+       environment:
+         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port }}/
+         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port }}/
+         KVVERSION: "{{ KVVERSION }}"
+       when: nodeType == "master-1"
+
+     - name: Create kube-vip manifest at /etc/kubernetes/manifests
+       environment:
+         VIP: "{{ VIP }}"
+         KVVERSION: "{{ KVVERSION }}"
+         INTERFACE: "ens4"           
+       ansible.builtin.shell: | 
+                               ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip manifest pod \
+                                       --interface $INTERFACE \
+                                       --address $VIP \
+                                       --controlplane \
+                                       --services \
+                                       --arp \
+                                       --leaderElection | tee /etc/kubernetes/manifests/kube-vip.yaml
+       register: kube_vip_manifest
+       when: nodeType == "master-1"
+
+     - name: Print kube_vip_manifest
+       ansible.builtin.debug:
+         msg: "{{ kube_vip_manifest }}"
+       when: nodeType == "master-1"
+
+     - name: /etc/kubernetes/manifests/kube-vip.yaml from remote to local.
+       ansible.builtin.fetch:
+         src: /etc/kubernetes/manifests/kube-vip.yaml
+         dest: ./ClusterInitFiles/
+         flat: true
+       when: nodeType == "master-1"
+
      - name: Intilizing Kubernetes Cluster
-       ansible.builtin.shell: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}"
-       when: nodeType == "master"
+       ansible.builtin.shell: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}" --control-plane-endpoint "{{ VIP }}"
+       register: kubeadm_init_out
+       when: nodeType == "master-1"
+       
+     - name: Print kubeadm_init_out
+       ansible.builtin.debug:
+         msg: "{{ kubeadm_init_out }}"
+       when: nodeType == "master-1"
 
      - name: /etc/kubernetes/admin.conf from remote to local.
        ansible.builtin.fetch:
          src: /etc/kubernetes/admin.conf
          dest: ./ClusterInitFiles/
          flat: true
-       when: nodeType == "master"
+       when: nodeType == "master-1"
 
      - name: Get the token for joining the nodes with Kuberentes master.
        ansible.builtin.command: kubeadm token create  --print-join-command
        register: kubernetes_join_command
-       when: nodeType == "master"
+       when: nodeType == "master-1"
 
      - name: Get join commmand
        ansible.builtin.debug:
          msg: "{{ kubernetes_join_command.stdout }}"
-       when: nodeType == "master"
+       when: nodeType == "master-1"
 
      - name: Copy join command to local file
        ansible.builtin.copy:
@@ -186,30 +234,45 @@
          dest: "./ClusterInitFiles/kubernetes_join_command"
          mode: 0600
        delegate_to: localhost
-       when: nodeType == "master"
+       when: nodeType == "master-1"
 
-     - name: Copy join command from Ansiblehost to the worker nodes.
+     - name: Copy join command from Ansiblehost to other nodes.
        ansible.builtin.copy:
          src: ./ClusterInitFiles/kubernetes_join_command
          dest: /tmp/kubernetes_join_command
          mode: 0500
-       when: nodeType == "worker"
+       when: nodeType == "worker" or nodeType == "master-other"
+     
+     - name: Add --control-plane to the end of join command for other master nodes
+       ansible.builtin.lineinfile: 
+         path: /tmp/kubernetes_join_command
+         regexp: '(kubeadm .*)'
+         line: '\1 --control-plane'
+         backrefs: yes
+       when:  nodeType == "master-other"
 
-     - name: Join the Worker nodes to the cluster.
+     - name: Copy /etc/kubernetes/manifests/kube-vip.yaml to other master nodes
+       ansible.builtin.copy:
+         src: ./ClusterInitFiles/kube-vip.yaml
+         dest: /etc/kubernetes/manifests/kube-vip.yaml
+         mode: 0500
+       when:  nodeType == "master-other"
+
+     - name: Join other nodes to the cluster.
        ansible.builtin.command: sh /tmp/kubernetes_join_command
        register: joined_or_not
-       when: nodeType == "worker"
+       when: nodeType == "worker" or nodeType == "master-other"
 
      - name: Get Joiner or not
        ansible.builtin.debug:
          msg: "{{ joined_or_not }}"
-       when: nodeType == "worker"
+       when: nodeType == "worker" or nodeType == "master-other"
 
      - name: Delete join file
        ansible.builtin.file:
          path: /tmp/kubernetes_join_command
          state: absent
-       when: nodeType == "worker"
+       when: nodeType == "worker" or nodeType == "master-other"
 
      - name: Insert a line at the end of /var/lib/kubelet/config.yaml
        ansible.builtin.lineinfile:

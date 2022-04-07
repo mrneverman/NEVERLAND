@@ -1,3 +1,13 @@
+variable "master_nodes_name" {
+  type = list(any)
+  default = ["nevertown-1",
+    "nevertown-2",
+    "nevertown-3"
+  ]
+  description = "Name of master nodes"
+}
+
+
 variable "worker_nodes_name" {
   type = list(any)
   default = ["worktown-1",
@@ -42,5 +52,10 @@ variable "tinyproxy_port" {
 variable "istioingressgateway_port" {
   default     = "31128"
   description = "The port listened by tinyproxy"
+}
+
+variable "kubeapi_vpi" {
+  default     = "10.240.0.60"
+  description = "Kubeapi server virtual ip"
 }
 

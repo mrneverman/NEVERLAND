@@ -27,7 +27,7 @@ SinkAll:
 	#Sink All: Destroy all gcloud instances
 	cd terraform &&\
 	terraform destroy -auto-approve &&\
-	rm goldilocks_dashboard_firewall.tf
+	rm goldilocks_dashboard_firewall.tf 2> /dev/null || true 
 
 RiseAndShine: Rise Shine
 
@@ -69,7 +69,7 @@ ListIPs:
 # IP address:
 PortofNeverland = $(shell grep ansible_host ./ansible/inventory.cfg|grep portOfNeverland  | sed 's/.*=//g')
 IslandOfIntelligence = $(shell grep ansible_host ./ansible/inventory.cfg|grep islandOfIntelligence  | sed 's/.*=//g')
-Nevertown = $(shell grep ansible_host ./ansible/inventory.cfg|grep Nevertown | sed 's/.*=//g')
+Nevertown = $(shell grep ansible_host ./ansible/inventory.cfg|grep nevertown-$(Nu) | sed 's/.*=//g')
 Worktown = $(shell grep ansible_host ./ansible/inventory.cfg|grep worktown-$(Nu) | sed 's/.*=//g')
 Infratown = $(shell grep ansible_host ./ansible/inventory.cfg|grep infratown-$(Nu) | sed 's/.*=//g')
 
@@ -80,6 +80,7 @@ IslandOfIntelligence:
 	ssh -o "StrictHostKeyChecking=no" -i sensitive_data/spyman spyman@$(IslandOfIntelligence)
 
 Nevertown:
+	test -n "$(Nu)" || (echo "set Nu. for nevertown number. Ex: make Nevertown Nu=1" ; exit 1) &&\
 	ssh -o "StrictHostKeyChecking=no" -o ProxyCommand="ssh -o \"StrictHostKeyChecking=no\" -i sensitive_data/fisherman -W %h:%p fisherman@$(PortofNeverland)" -i sensitive_data/kubeman kubeman@$(Nevertown)
 
 Worktown:

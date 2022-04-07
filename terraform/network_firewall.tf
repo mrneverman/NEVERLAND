@@ -30,6 +30,7 @@ resource "local_file" "tf_network_vars_file_new" {
     vpc_pod_cidr: ${var.vpc_pod_cidr}
     vpc_svc_cidr: ${var.vpc_svc_cidr}
     istioingressgateway_port: ${var.istioingressgateway_port}
+    kubeapi_vpi: ${var.kubeapi_vpi}
     DOC
   filename = "../ansible/terraform_variables/tf_network_vars_file.yml"
 }
@@ -109,7 +110,7 @@ resource "google_compute_firewall" "allow-reverse-proxy-to-istio-ingressgateway"
     ports    = [var.istioingressgateway_port]
   }
 
-  target_tags = ["k8s-worker"]
+  target_tags = ["internal"]
   source_tags = ["proxy"]
 }
 

@@ -1,0 +1,34 @@
+# Based on https://github.com/vmwarecloudadvocacy/acme_fitness_demo
+- name: Deploy sample Acme App
+  hosts: portOfNeverland
+  gather_facts: false
+  become: true
+  become_user: fisherman
+  vars_files:
+  - ./terraform_variables/tf_island-of-intelligence_vars_file.yml
+  - ./terraform_variables/tf_network_vars_file.yml
+  - ./terraform_variables/tf_k8node_vars_file.yml
+
+  tasks:
+  - name: Wait 300 seconds for ssh timeout, but only start checking after 1 seconds
+    ansible.builtin.wait_for_connection:
+      delay: 1
+      timeout: 300
+
+
+  - name: Create hpa
+    ansible.builtin.shell:
+      cmd: |
+            kubectl -n sampleapp delete hpa cart 
+            kubectl -n sampleapp delete hpa cart-redis 
+            kubectl -n sampleapp delete hpa catalog 
+            kubectl -n sampleapp delete hpa catalog-mongo 
+            kubectl -n sampleapp delete hpa frontend 
+            kubectl -n sampleapp delete hpa order 
+            kubectl -n sampleapp delete hpa order-postgres 
+            kubectl -n sampleapp delete hpa payment 
+            kubectl -n sampleapp delete hpa pos 
+            kubectl -n sampleapp delete hpa users 
+            kubectl -n sampleapp delete hpa users-mongo 
+            kubectl -n sampleapp delete hpa users-redis 
+

@@ -16,10 +16,12 @@ ansible_user = spyman
 ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/spyman
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
-[Nevertown]
-Nevertown ansible_host=${nevertownIP} 
+[Nevertowns]
+%{ for name, ip in nevertownsIP}
+${name} ansible_host=${ip}
+%{ endfor ~}
 
-[Nevertown:vars]
+[Nevertowns:vars]
 ansible_port = 22
 ansible_user = kubeman
 ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/kubeman
