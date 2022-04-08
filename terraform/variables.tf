@@ -54,8 +54,4 @@ variable "istioingressgateway_port" {
   description = "The port listened by tinyproxy"
 }
 
-variable "kubeapi_vpi" {
-  default     = "10.240.0.60"
-  description = "Kubeapi server virtual ip"
-}
 

@@ -159,50 +159,8 @@
          https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port }}/
        when: install_kubectl
 
-     - name: Create /etc/kubernetes/manifests
-       ansible.builtin.file:
-         path: /etc/kubernetes/manifests
-         state: directory
-         mode: 0755
-
-     - name: Pull ghcr.io/kube-vip/kube-vip image
-       ansible.builtin.command: ctr images pull ghcr.io/kube-vip/kube-vip:$KVVERSION
-       environment:
-         http_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port }}/
-         https_proxy: http://{{ ioi_internal_ip }}:{{ tinyproxy_port }}/
-         KVVERSION: "{{ KVVERSION }}"
-       when: nodeType == "master-1"
-
-     - name: Create kube-vip manifest at /etc/kubernetes/manifests
-       environment:
-         VIP: "{{ VIP }}"
-         KVVERSION: "{{ KVVERSION }}"
-         INTERFACE: "ens4"           
-       ansible.builtin.shell: | 
-                               ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip manifest pod \
-                                       --interface $INTERFACE \
-                                       --address $VIP \
-                                       --controlplane \
-                                       --services \
-                                       --arp \
-                                       --leaderElection | tee /etc/kubernetes/manifests/kube-vip.yaml
-       register: kube_vip_manifest
-       when: nodeType == "master-1"
-
-     - name: Print kube_vip_manifest
-       ansible.builtin.debug:
-         msg: "{{ kube_vip_manifest }}"
-       when: nodeType == "master-1"
-
-     - name: /etc/kubernetes/manifests/kube-vip.yaml from remote to local.
-       ansible.builtin.fetch:
-         src: /etc/kubernetes/manifests/kube-vip.yaml
-         dest: ./ClusterInitFiles/
-         flat: true
-       when: nodeType == "master-1"
-
      - name: Intilizing Kubernetes Cluster
-       ansible.builtin.shell: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}" --control-plane-endpoint "{{ VIP }}"
+       ansible.builtin.shell: kubeadm init --pod-network-cidr "{{ vpc_pod_cidr }}" --service-cidr "{{ vpc_svc_cidr }}" --control-plane-endpoint "{{ LBIP }}"
        register: kubeadm_init_out
        when: nodeType == "master-1"
        
@@ -249,13 +207,6 @@
          regexp: '(kubeadm .*)'
          line: '\1 --control-plane'
          backrefs: yes
-       when:  nodeType == "master-other"
-
-     - name: Copy /etc/kubernetes/manifests/kube-vip.yaml to other master nodes
-       ansible.builtin.copy:
-         src: ./ClusterInitFiles/kube-vip.yaml
-         dest: /etc/kubernetes/manifests/kube-vip.yaml
-         mode: 0500
        when:  nodeType == "master-other"
 
      - name: Join other nodes to the cluster.

@@ -28,3 +28,6 @@ output "ip" {
   value = google_compute_instance.gci.network_interface.0.network_ip
 }
 
+output "self_link" {
+  value = google_compute_instance.gci.self_link
+}
