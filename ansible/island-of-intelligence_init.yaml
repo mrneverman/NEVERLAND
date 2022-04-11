@@ -89,7 +89,7 @@
     ansible.builtin.blockinfile:
       path: "/etc/haproxy/haproxy.cfg"
       block: |
-              server node{{ ansible_loop.index }}  {{ item }}:{{ istioingressgateway_port }} check check-sni neverland.com sni str(neverland.com) ssl verify none
+              server {{ worker_nodes[ansible_loop.index - 1] }} {{ item }}:{{ istioingressgateway_port }} check check-sni neverland.com sni str(neverland.com) ssl verify none
       marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
     loop: "{{ worktowns_internal_ip }}"
     loop_control:
