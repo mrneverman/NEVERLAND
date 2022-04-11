@@ -90,7 +90,7 @@
       path: "/etc/haproxy/haproxy.cfg"
       block: |
               server {{ worker_nodes[ansible_loop.index - 1] }} {{ item }}:{{ istioingressgateway_port }} check check-sni neverland.com sni str(neverland.com) ssl verify none
-      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ worker_nodes[ansible_loop.index - 1] }}"
     loop: "{{ worktowns_internal_ip }}"
     loop_control:
       extended: true
