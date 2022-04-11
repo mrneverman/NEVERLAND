@@ -7,6 +7,11 @@ variable "master_nodes_name" {
   description = "Name of master nodes"
 }
 
+variable "add_all_master_node_to_lb" {
+  default     = false
+  description = "control variable to add all master nodes to gcloud load balancer"
+}
+
 
 variable "worker_nodes_name" {
   type = list(any)

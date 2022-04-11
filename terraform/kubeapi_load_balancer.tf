@@ -2,16 +2,15 @@ resource "google_compute_instance_group" "nevertowns" {
   name        = "nevertowns"
   description = "control planes nodes instance group"
 
-  instances = [for name in var.master_nodes_name :  module.nevertowns[name].self_link]
-
-
-  named_port {
+ instances = (var.add_all_master_node_to_lb == true ?  [for name in var.master_nodes_name :  module.nevertowns[name].self_link] : [module.nevertowns[var.master_nodes_name[0]].self_link]) 
+ named_port {
     name = "https"
     port = "6443"
   }
 
   zone = "europe-west6-a"
 }
+
 
 resource "google_compute_health_check" "kubeapi-health-check" {
   name     = "kubeapi-health-check"

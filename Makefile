@@ -1,7 +1,7 @@
 Rise:
 	# Rise NEVERLAND : Create gcloud instances defined in terraform folder
 	cd terraform &&\
-	terraform apply -auto-approve
+	terraform apply -auto-approve -var="add_all_master_node_to_lb=false"
 
 Knock:
 	# ansible ping all instance in NEVERLAND
@@ -13,15 +13,18 @@ Shine:
 	#Shine NEVERLAND: K8s cluster installation and configuration via ansible
 	cd ansible &&\
 	ansible-playbook -i inventory.cfg island-of-intelligence_init.yaml &&\
-	ansible-playbook -i inventory.cfg nevertown_init.yaml &&\
-	ansible-playbook -i inventory.cfg worktown_init.yaml &&\
+	ansible-playbook -i inventory.cfg nevertown-1_init.yaml &&\
 	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml &&\
+	ansible-playbook -i inventory.cfg nevertown-2_init.yaml &&\
+	ansible-playbook -i inventory.cfg worktown_init.yaml &&\
 	ansible-playbook -i inventory.cfg cluster_settings.yaml &&\
 	ansible-playbook -i inventory.cfg calico_install.yaml &&\
 	ansible-playbook -i inventory.cfg istio_install.yaml &&\
 	ansible-playbook -i inventory.cfg metrics-server_install.yaml &&\
 	ansible-playbook -i inventory.cfg prometheus_install.yaml &&\
-	ansible-playbook -i inventory.cfg sampleAcmeApp.yaml
+	ansible-playbook -i inventory.cfg sampleAcmeApp.yaml &&\
+	cd ../terraform &&\
+	terraform apply -auto-approve -var="add_all_master_node_to_lb=true"
 
 SinkAll:
 	#Sink All: Destroy all gcloud instances
@@ -64,7 +67,8 @@ LocustUp:
 
 ListIPs:
 	#List IPs of instances
-	grep ansible_host ./ansible/inventory.cfg
+	cd terraform &&\
+	terraform show|grep Outputs: -A100
 
 # IP address:
 PortofNeverland = $(shell grep ansible_host ./ansible/inventory.cfg|grep portOfNeverland  | sed 's/.*=//g')
