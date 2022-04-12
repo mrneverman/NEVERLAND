@@ -7,11 +7,15 @@ variable "master_nodes_name" {
   description = "Name of master nodes"
 }
 
-variable "add_all_master_node_to_lb" {
-  default     = false
+variable "add_master_node_to_lb" {
+  default     = "only_master-1"
   description = "control variable to add all master nodes to gcloud load balancer"
 }
 
+variable "firewall-allow-goldilocks-dashboard" {
+  default = false
+  description = "Allow port 8080 on bastion host for 0.0.0.0/0 for goldilocks-dashboard"
+}
 
 variable "worker_nodes_name" {
   type = list(any)

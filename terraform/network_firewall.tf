@@ -30,7 +30,7 @@ resource "local_file" "tf_network_vars_file_new" {
     vpc_pod_cidr: ${var.vpc_pod_cidr}
     vpc_svc_cidr: ${var.vpc_svc_cidr}
     istioingressgateway_port: ${var.istioingressgateway_port}
-    kubeapi_LBfrontend_IP: ${google_compute_forwarding_rule.kubeapi_forwarding_rule.ip_address}
+    kubeapi_LBfrontend_IP: ${google_compute_forwarding_rule.kubeapi-forwarding-rule.ip_address}
     DOC
   filename = "../ansible/terraform_variables/tf_network_vars_file.yml"
 }
