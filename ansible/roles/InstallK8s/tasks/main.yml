@@ -212,7 +212,7 @@
        when: nodeType == "worker" or nodeType == "master-other"
        until: joined_or_not.stdout.find("This node has joined the cluster") != -1
        retries: 10
-       delay: 5
+       delay: 3
 
      - name: Get Joiner or not
        ansible.builtin.debug:
