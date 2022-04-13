@@ -22,6 +22,4 @@
       install_kubelet: true
       install_kubeadm: true
       install_kubectl: false
-      nodeType: "master-1"
       LBIP: "{{ kubeapi_LBfrontend_IP }}"
-      KVVERSION: "v0.4.3"  

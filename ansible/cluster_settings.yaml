@@ -14,10 +14,6 @@
       delay: 1
       timeout: 300
 
-  - name: Approve pending certificate
-    ansible.builtin.shell:
-      cmd: kubectl get csr | grep Pending | grep kubelet-serving | awk '{print $1}' | xargs kubectl certificate approve
-
   - name: Taint infrastructure towns
     ansible.builtin.command: kubectl taint node {{ item }} node-role.kubernetes.io/infra:NoSchedule
     loop: "{{ infrastructure_nodes }}"
@@ -36,3 +32,9 @@
 
   - name: Create monitoring namespace
     ansible.builtin.command: kubectl create namespace monitoring
+
+  - name: Approve pending certificate
+    ansible.builtin.shell:
+      cmd: kubectl get csr | grep Pending | grep kubelet-serving | awk '{print $1}' | xargs kubectl certificate approve
+
+

@@ -1,7 +1,7 @@
 Rise:
 	# Rise NEVERLAND : Create gcloud instances defined in terraform folder
 	cd terraform &&\
-	terraform apply -auto-approve -var "add_all_master_node_to_lb=only_master-1"
+	terraform apply -auto-approve -var="add_master_node_to_lb=only_master-1"
 
 Knock:
 	# ansible ping all instance in NEVERLAND
@@ -15,8 +15,7 @@ Shine:
 	ansible-playbook -i inventory.cfg island-of-intelligence_init.yaml &&\
 	ansible-playbook -i inventory.cfg nevertown-1_init.yaml &&\
 	ansible-playbook -i inventory.cfg port-of-neverland_init.yaml &&\
-	ansible-playbook -i inventory.cfg nevertown-2_init.yaml &&\
-	ansible-playbook -i inventory.cfg worktown_init.yaml &&\
+	ansible-playbook -i inventory.cfg town_init.yaml &&\
 	ansible-playbook -i inventory.cfg cluster_settings.yaml &&\
 	ansible-playbook -i inventory.cfg calico_install.yaml &&\
 	ansible-playbook -i inventory.cfg istio_install.yaml &&\
@@ -24,7 +23,7 @@ Shine:
 	ansible-playbook -i inventory.cfg prometheus_install.yaml &&\
 	ansible-playbook -i inventory.cfg sampleAcmeApp.yaml &&\
 	cd ../terraform &&\
-	terraform apply -auto-approve -var "add_all_master_node_to_lb=all_masters"
+	terraform apply -auto-approve -var="add_master_node_to_lb=all_masters"
 
 SinkAll:
 	#Sink All: Destroy all gcloud instances
@@ -35,13 +34,13 @@ RiseAndShine: Rise Shine
 
 SinkAndRise: SinkAll Rise
 
-Reborn: SinkAll Rise Shine
+Reborn: SinkAll Rise Knock Shine
 
 GoldilocksUp:
 	#Run Goldilocks Dashboard: 
 	test -n "$(Namespace)" || (echo "Set target namespace for Goldilocks. Ex: make GoldilocksUp Namespace=sampleapp" ; exit 1) &&\
 	cd terraform &&\
-	terraform apply -auto-approve -var="firewall-allow-goldilocks-dashboard=true" -var="add_all_master_node_to_lb=all_masters" &&\
+	terraform apply -auto-approve -var="firewall-allow-goldilocks-dashboard=true" -var="add_master_node_to_lb=all_masters" &&\
 	cd ../ansible &&\
 	ansible-playbook -i inventory.cfg goldilocks_install.yaml --extra-vars "Namespace=$(Namespace)"
 
@@ -49,7 +48,7 @@ GoldilocksDown:
 	#Down Goldilocks Dashboard: Set namespace for Goldilocks. Ex: Namespace=sampleapp
 	test -n "$(Namespace)" || (echo "Set target namespace for Goldilocks. Ex: make GoldilocksDown Namespace=sampleapp" ; exit 1) &&\
 	cd terraform &&\
-	terraform apply -auto-approve -var="firewall-allow-goldilocks-dashboard=false" -var="add_all_master_node_to_lb=all_masters"  &&\
+	terraform apply -auto-approve -var="firewall-allow-goldilocks-dashboard=false" -var="add_master_node_to_lb=all_masters"  &&\
 	cd ../ansible &&\
 	ansible-playbook -i inventory.cfg goldilocks_uninstall.yaml --extra-vars "Namespace=$(Namespace)"
 
