@@ -68,9 +68,8 @@ Items in the technology roadmap of Neverland are listed  below in unordered ways
 - Kyverno: Kubernetes Native Policy Management
 - Create a very secure Securetown(s) with Gvisor & AppArmor for top secret projects of Neverland
 - HashiCorp Vault
-- Implementation of CD pipelines( ArgoCD, Jenkins, GitLab, Flux, Fleet,).
-- Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface.
-- Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8).
-- Log monitoring (Elastic Stack & fluentd)
+- Implementation of CD pipelines( ArgoCD, Jenkins, GitLab, Flux, Fleet)
+- Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface
+- Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8)
 - Statefulset & Database implementation
 
