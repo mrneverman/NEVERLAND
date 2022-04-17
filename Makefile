@@ -30,7 +30,7 @@ SinkAll:
 	cd terraform &&\
 	terraform destroy -auto-approve
 
-RiseAndShine: Rise Shine
+RiseAndShine: Rise Knock Shine
 
 SinkAndRise: SinkAll Rise
 
