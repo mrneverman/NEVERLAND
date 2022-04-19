@@ -61,6 +61,8 @@ kube-state-metrics:
 
 prometheus:
   prometheusSpec:
+    scrapeInterval: 5s
+    evaluationInterval: 10s
     externalUrl: /prometheus/
     replicas: 2
     tolerations:
