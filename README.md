@@ -57,13 +57,15 @@ In AN.3, below items were completed.
 - Google Cloud internal tcp load balance was used to  load balance the traffic to the kube api server
 - Kubernetes Metrics Server was installed via helm chart
 - Kube-prometheus stack  was installed via helm chart
-- Goldilocks was installed via helm chart
+- Goldilocks was installed via helm chart and used to set resources
+- ansible-lint check and fixes
 - [ACME Fitness Shop](https://github.com/vmwarecloudadvocacy/acme_fitness_demo "ACME Fitness Shop") was deployed
 - [Locust](https://locust.io/ "Locust") was used for load testing
 
 
 ## Technology Roadmap of Neverland
 Items in the technology roadmap of Neverland are listed  below in unordered ways
+- Separate ETCD from Nevertown and implement in different island called RegisterTown
 - Kube-Bench: An Open Source Tool for Running Kubernetes CIS Benchmark Tests
 - Trivy: Vulnerability/Misconfiguration Scanner
 - Elasticsearch, Fluentd and Kibana (EFK) Logging Stack
@@ -75,5 +77,5 @@ Items in the technology roadmap of Neverland are listed  below in unordered ways
 - Implementation of CD pipelines( ArgoCD, Jenkins, GitLab, Flux, Fleet)
 - Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface
 - Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8)
-- Statefulset & Database implementation
+- Statefulset & Database & Operator
 
