@@ -62,6 +62,10 @@ In AN.3, below items were completed.
 - [ACME Fitness Shop](https://github.com/vmwarecloudadvocacy/acme_fitness_demo "ACME Fitness Shop") was deployed
 - [Locust](https://locust.io/ "Locust") was used for load testing
 
+- ##### AN.4 (In progress) :
+- Separate ETCD from Nevertown and implement in different island called RegisterTown
+  - RegisterTowns created in Terraform 
+
 
 ## Technology Roadmap of Neverland
 Items in the technology roadmap of Neverland are listed  below in unordered ways
@@ -77,5 +81,5 @@ Items in the technology roadmap of Neverland are listed  below in unordered ways
 - Implementation of CD pipelines( ArgoCD, Jenkins, GitLab, Flux, Fleet)
 - Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface
 - Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8)
-- Statefulset & Database & Operator
+- Kubernetes Operator & CRD
 
