@@ -18,7 +18,7 @@ There is only one motto here: Everything As Code!!
 ## History of Neverland
 
 - ##### AN.0 :
-Neverland is created by Mr.Neverman in AN.0 with the inspiration of [Republic of Rose Island](https://en.wikipedia.org/wiki/Republic_of_Rose_Island) created by the Italian engineer Giorgio Rosa. It is created to work and get experience on the latest trends in cloud native technologies in a fun way. All infrastructure components are provisioned by Terraform and live on the Google Cloud platform. Thanks to IaC approaches, they can be mapped to other cloud providers(AWS, Azure, DigitalOcean etc) with a minimal effort. Once the infrastructure is provisioned via Terraform, Ansible comes into play for configuration management and deployments. Each island represents a separate virtual machine. At the initial phase of the development, all islands(VMs) were created using Ubuntu OS image which is provided by Google Cloud. Number of Workertowns can be dynamically provisioned and configured in case of the increase in workloads.
+Neverland is created by Mr.Neverman in AN.0 with the inspiration of [Republic of Rose Island](https://en.wikipedia.org/wiki/Republic_of_Rose_Island) created by the Italian engineer Giorgio Rosa. It is created to work and get experience on the latest trends in cloud native technologies in a fun way. All infrastructure components are provisioned by Terraform and live on the Google Cloud platform. Thanks to IaC approaches, they can be mapped to other cloud providers(AWS, Azure, DigitalOcean etc) with a minimal effort. Once the infrastructure is provisioned via Terraform, Ansible comes into play for configuration management and deployments. Each island represents a separate virtual machine. At the initial phase of the development, all islands(VMs) were created using Ubuntu OS image which is provided by Google Cloud. Number of Worktown(s) can be dynamically provisioned and configured in case of the increase in workloads.
 - ##### AN.1 :
  In AN.1, below items were completed.
 - [Google Cloud VPC and  subnet configurations](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/terraform/network_firewall.tf "Google Cloud VPC and  subnet configurations") were created.
@@ -57,13 +57,15 @@ In AN.3, below items were completed.
 - Google Cloud internal tcp load balance was used to  load balance the traffic to the kube api server
 - Kubernetes Metrics Server was installed via helm chart
 - Kube-prometheus stack  was installed via helm chart
-- Goldilocks was installed via helm chart
+- Goldilocks was installed via helm chart and used to set resources
+- ansible-lint check and fixes
 - [ACME Fitness Shop](https://github.com/vmwarecloudadvocacy/acme_fitness_demo "ACME Fitness Shop") was deployed
 - [Locust](https://locust.io/ "Locust") was used for load testing
 
 
 ## Technology Roadmap of Neverland
 Items in the technology roadmap of Neverland are listed  below in unordered ways
+- Separate ETCD from Nevertown and implement in different island called RegisterTown
 - Kube-Bench: An Open Source Tool for Running Kubernetes CIS Benchmark Tests
 - Trivy: Vulnerability/Misconfiguration Scanner
 - Elasticsearch, Fluentd and Kibana (EFK) Logging Stack
@@ -75,5 +77,5 @@ Items in the technology roadmap of Neverland are listed  below in unordered ways
 - Implementation of CD pipelines( ArgoCD, Jenkins, GitLab, Flux, Fleet)
 - Use of Fedora CoreOS or Google Container-Optimized OS instead of Ubuntu for lightweight OS and smaller attack surface
 - Automated Testing (Some ideas: https://www.youtube.com/watch?v=xhHOW0EF5u8)
-- Statefulset & Database implementation
+- Statefulset & Database & Operator
 
