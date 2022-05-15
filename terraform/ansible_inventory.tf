@@ -6,6 +6,9 @@ resource "local_file" "ansible_inventory" {
       nevertownsIP = {
         for name in var.master_nodes_name : name => module.nevertowns[name].ip
       }
+      registertownsIP = {
+        for name in var.etcd_nodes_name : name => module.registertowns[name].ip
+      }
       worktownsIP = {
         for name in var.worker_nodes_name : name => module.worktowns[name].ip
       }

@@ -7,6 +7,15 @@ module "nevertowns" {
   for_each        = toset(var.master_nodes_name)
 }
 
+module "registertowns" {
+  source          = "./modules/gci"
+  instance_name   = each.key
+  ssh_user        = "registerman"
+  tags            = ["k8s-etcd", "internal"]
+  subnetwork_name = google_compute_subnetwork.neverland-gcn-subnetwork.id
+  for_each        = toset(var.etcd_nodes_name)
+}
+
 module "worktowns" {
   source          = "./modules/gci"
   instance_name   = each.key
@@ -28,6 +37,12 @@ module "infratowns" {
 output "nevertowns-IPs" {
   value = {
     for name in var.master_nodes_name : name => module.nevertowns[name].ip
+  }
+}
+
+output "registertowns-IPs" {
+  value = {
+    for name in var.etcd_nodes_name : name => module.registertowns[name].ip
   }
 }
 
@@ -55,6 +70,11 @@ resource "local_file" "tf_k8node_vars_file_new" {
       - ${module.nevertowns[name].ip}
     %{endfor~}
 
+    registertowns_internal_ip:
+    %{for name in var.etcd_nodes_name~}
+      - ${module.registertowns[name].ip}
+    %{endfor~}
+
     worktowns_internal_ip:
     %{for name in var.worker_nodes_name~}
       - ${module.worktowns[name].ip}
@@ -67,6 +87,11 @@ resource "local_file" "tf_k8node_vars_file_new" {
 
     master_nodes:
     %{for name in var.master_nodes_name~}
+      - "${name}"
+    %{endfor~}
+
+    etcd_nodes:
+    %{for name in var.etcd_nodes_name~}
       - "${name}"
     %{endfor~}
 

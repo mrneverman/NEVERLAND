@@ -7,15 +7,15 @@ variable "master_nodes_name" {
   description = "Name of master nodes"
 }
 
-variable "add_master_node_to_lb" {
-  default     = "only_master-1"
-  description = "control variable to add all master nodes to gcloud load balancer"
+variable "etcd_nodes_name" {
+  type = list(any)
+  default = ["registertown-1",
+    "registertown-2",
+    "registertown-3"
+  ]
+  description = "Name of etcd nodes"
 }
 
-variable "firewall-allow-goldilocks-dashboard" {
-  default = false
-  description = "Allow port 8080 on bastion host for 0.0.0.0/0 for goldilocks-dashboard"
-}
 
 variable "worker_nodes_name" {
   type = list(any)
@@ -36,7 +36,15 @@ variable "infrastructure_nodes_name" {
   description = "Name of infrastructure nodes that will host monitoring, istio daemon and related pods. "
 }
 
+variable "add_master_node_to_lb" {
+  default     = "only_master-1"
+  description = "control variable to add all master nodes to gcloud load balancer"
+}
 
+variable "firewall-allow-goldilocks-dashboard" {
+  default     = false
+  description = "Allow port 8080 on bastion host for 0.0.0.0/0 for goldilocks-dashboard"
+}
 
 variable "vpc_cidr" {
   default     = "10.240.0.0/24"

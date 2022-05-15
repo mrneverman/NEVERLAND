@@ -27,6 +27,17 @@ ansible_user = kubeman
 ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/kubeman
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' -i /root/NEVERLAND/sensitive_data/fisherman -W %h:%p fisherman@${portOfNeverlandIP}"'
 
+[Registertowns]
+%{ for name, ip in registertownsIP}
+${name} ansible_host=${ip}
+%{ endfor ~}
+
+[Registertowns:vars]
+ansible_port = 22
+ansible_user = registerman
+ansible_ssh_private_key_file = /root/NEVERLAND/sensitive_data/registerman
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' -i /root/NEVERLAND/sensitive_data/fisherman -W %h:%p fisherman@${portOfNeverlandIP}"'
+
 [Worktowns]
 %{ for name, ip in worktownsIP}
 ${name} ansible_host=${ip}
