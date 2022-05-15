@@ -1,5 +1,5 @@
 resource "google_compute_firewall" "allow-goldilocks-dashboard" {
-  count = var.firewall-allow-goldilocks-dashboard ? 1 : 0
+  count   = var.firewall-allow-goldilocks-dashboard ? 1 : 0
   name    = "allow-goldilocks-dashboard"
   network = google_compute_network.neverland-gcn.id
 

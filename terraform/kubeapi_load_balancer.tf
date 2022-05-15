@@ -2,8 +2,8 @@ resource "google_compute_instance_group" "nevertowns" {
   name        = "nevertowns"
   description = "control planes nodes instance group"
 
- instances = (var.add_master_node_to_lb == "all_masters" ?  [for name in var.master_nodes_name :  module.nevertowns[name].self_link] : [module.nevertowns[var.master_nodes_name[0]].self_link]) 
- named_port {
+  instances = (var.add_master_node_to_lb == "all_masters" ? [for name in var.master_nodes_name : module.nevertowns[name].self_link] : [module.nevertowns[var.master_nodes_name[0]].self_link])
+  named_port {
     name = "https"
     port = "6443"
   }
@@ -13,9 +13,9 @@ resource "google_compute_instance_group" "nevertowns" {
 
 
 resource "google_compute_health_check" "kubeapi-health-check" {
-  name     = "kubeapi-health-check"
-  timeout_sec        = 1
-  check_interval_sec = 1
+  name                = "kubeapi-health-check"
+  timeout_sec         = 1
+  check_interval_sec  = 1
   healthy_threshold   = 4
   unhealthy_threshold = 5
   tcp_health_check {
@@ -43,8 +43,8 @@ resource "google_compute_region_backend_service" "kubeapi-backend" {
   load_balancing_scheme = "INTERNAL"
   health_checks         = [google_compute_health_check.kubeapi-health-check.id]
   backend {
-    group           = google_compute_instance_group.nevertowns.id
-    balancing_mode  = "CONNECTION"
+    group          = google_compute_instance_group.nevertowns.id
+    balancing_mode = "CONNECTION"
   }
 }
 
