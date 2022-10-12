@@ -17,9 +17,9 @@ There is only one motto here: Everything As Code!!
 
 ## History of Neverland
 
-- ##### AN.0 :
+ #### AN.0 :
 Neverland is created by Mr.Neverman in AN.0 with the inspiration of [Republic of Rose Island](https://en.wikipedia.org/wiki/Republic_of_Rose_Island) created by the Italian engineer Giorgio Rosa. It is created to work and get experience on the latest trends in cloud native technologies in a fun way. All infrastructure components are provisioned by Terraform and live on the Google Cloud platform. Thanks to IaC approaches, they can be mapped to other cloud providers(AWS, Azure, DigitalOcean etc) with a minimal effort. Once the infrastructure is provisioned via Terraform, Ansible comes into play for configuration management and deployments. Each island represents a separate virtual machine. At the initial phase of the development, all islands(VMs) were created using Ubuntu OS image which is provided by Google Cloud. Number of Worktown(s) can be dynamically provisioned and configured in case of the increase in workloads.
-- ##### AN.1 :
+ #### AN.1 :
  In AN.1, below items were completed.
 - [Google Cloud VPC and  subnet configurations](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/terraform/network_firewall.tf "Google Cloud VPC and  subnet configurations") were created.
 - [Firewall rules were created.](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/terraform/network_firewall.tf "Firewall rules were created.")
@@ -28,7 +28,7 @@ Neverland is created by Mr.Neverman in AN.0 with the inspiration of [Republic of
 - [Tinyproxy](http://tinyproxy.github.io/ "Tinyproxy") was installed in "Island of Intelligence" as a transparent proxy and it can be accessed via the private key of a "spyman"user.
 - Terraform creates an Ansible inventory file by using Terraform [templatefile](https://www.terraform.io/language/functions/templatefile "templatefile") function. Sample inventory file can accessed via this [link](https://github.com/mrneverman/NEVERLAND/blob/e9127e4742b800ff91d4a4c4cdfadd701a310f0a/ansible/inventory_sample.cfg "link").
 
-- ##### AN.2 :
+ #### AN.2 :
 In AN.2, below items were completed.
 - Makefile created to ease the provision, configuration and deployment of Neverland.
 Some of the make commands are:
@@ -51,7 +51,7 @@ Some of the make commands are:
 - [HAProxy](http://www.haproxy.org/ "HAProxy") were installed and configured in "Island of Intelligence”to serve as a layer-7 reverse proxy and load balancer. NodePort of Istio ingress gateway in worktowns are configured as a [backend](https://github.com/mrneverman/NEVERLAND/blob/main/ansible/island-of-intelligence_init.yaml#L88 "backend") server.
 - Self-signed [certificates](https://github.com/mrneverman/NEVERLAND/blob/c797b49a67b65703c0d48023619ea164fb742fd5/ansible/island-of-intelligence_init.yaml#L57 "certificates") were created for neverland.com and used for traffic encryption in HAProxy and Istio Gateway.
 
-- ##### AN.3 :
+ #### AN.3 :
 In AN.3, below items were completed.
 - Number of Nevertown(s) was increased for HA
 - Google Cloud internal tcp load balance was used to  load balance the traffic to the kube api server
@@ -62,7 +62,7 @@ In AN.3, below items were completed.
 - [ACME Fitness Shop](https://github.com/vmwarecloudadvocacy/acme_fitness_demo "ACME Fitness Shop") was deployed
 - [Locust](https://locust.io/ "Locust") was used for load testing
 
-- ##### AN.4 (In progress) :
+ #### AN.4 (In progress) :
 - Separate ETCD from Nevertown and implement in different island called RegisterTown
   - RegisterTowns created in Terraform 
 
